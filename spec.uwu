@@ -1,0 +1,79 @@
+🏳️‍⚧️ --------
+🏳️‍⚧️ COMMANDS
+🏳️‍⚧️ --------
+🏳️‍⚧️
+🏳️‍⚧️   OP   |    SYNTAX    |                           DESCRIPTION                          
+🏳️‍⚧️ -------+--------------+-----------------------------------------------------------------------
+🏳️‍⚧️   PSH  |  <keysmash>  | pushes a value to the stack
+🏳️‍⚧️   SWP  |     >w<      | swaps the last two items on the stack
+🏳️‍⚧️   ADD  |      :3      | pops and adds the last 2*N stack values (N = # of `3`)
+🏳️‍⚧️   PRN  |    mreow     | pops and prints the top stack value as an ASCII char
+🏳️‍⚧️   PRNU |    mreow~    | pops and prints the last 3 stack values as a UTF-8 char.
+🏳️‍⚧️        |              | constructs the char from its codepoint (last byte is padded with 0x00)
+🏳️‍⚧️        |              | i.e. [1, 249, 122] -> [0x01, 0xf9, 0x7a] -> \u{1f97a}
+🏳️‍⚧️   DUP  |     >//<     | duplicates the last N stack values (N = # of `//`)
+🏳️‍⚧️   SUB  |  <label> 🥺  | creates a new subroutine with the specified label
+🏳️‍⚧️   JMP  | <label> 👉👈 | jumps to the specified subroutine if the top stack value is 0 or empty
+🏳️‍⚧️   RET  |     >.<      | returns from a subroutine
+🏳️‍⚧️
+🏳️‍⚧️ ----------
+🏳️‍⚧️ KEYSMASHES
+🏳️‍⚧️ ----------
+🏳️‍⚧️
+🏳️‍⚧️ valid chars are [a-zA-Z] where the length of the keysmash is encoded as a byte value (0-255)
+🏳️‍⚧️ keysmashes must use either all lower-case or all uppercase chars and can be 1-128 chars long
+🏳️‍⚧️ keysmashes are converted to stack values by their length:
+🏳️‍⚧️   - lowercase keysmashes are encoded in the range 0-127 e.g. `sdbfkl` is 5 in decimal
+🏳️‍⚧️   - uppercase keysmashes are encoded in the range 128-256 e.g. `ASDLKFHJ` is 135 in decimal
+🏳️‍⚧️ keysmashes can be delimited by semicolons, as well as whitespace like all other tokens
+🏳️‍⚧️ e.g. `adslfjas asdkjh` is equivalent to `adslfjas;asdkjh`
+🏳️‍⚧️
+🏳️‍⚧️ --------
+🏳️‍⚧️ COMMENTS
+🏳️‍⚧️ --------
+🏳️‍⚧️
+🏳️‍⚧️comments start with the trans flag emoji :3
+🏳️‍⚧️
+🏳️‍⚧️--------
+🏳️‍⚧️PRINTING
+🏳️‍⚧️--------
+🏳️‍⚧️
+🏳️‍⚧️the print symbol can be customised via the BOTTOMSPEAK_PRINT_SYMBOLS env var
+🏳️‍⚧️which takes a slash-delimited series of lexemes to use instead of the default
+🏳️‍⚧️which is `BOTTOMSPEAK_PRINT_SYMBOLS="meow/mreow/mrrp/woof/wruff/yip"`
+🏳️‍⚧️
+🏳️‍⚧️ -----------
+🏳️‍⚧️ HELLO WORLD
+🏳️‍⚧️ -----------
+🏳️‍⚧️
+🏳️‍⚧️ DEC CHR
+🏳️‍⚧️ 72  H
+🏳️‍⚧️ 101 e
+🏳️‍⚧️ 108 l
+🏳️‍⚧️ 108 l
+🏳️‍⚧️ 111 o
+🏳️‍⚧️ 44  ,
+🏳️‍⚧️ 32   
+🏳️‍⚧️ 119 w
+🏳️‍⚧️ 111 o
+🏳️‍⚧️ 114 r
+🏳️‍⚧️ 108 l
+🏳️‍⚧️ 100 d
+🏳️‍⚧️ 33  !
+
+hawwo 🥺
+  asdelkjla;afsdlkfjaksldkfjd >//////<     🏳️‍⚧️[8, 16, 16, 16, 16]
+  :3333 >//< mreow                         🏳️‍⚧️[72] "H"
+  dksfhapsduiofalsdkfjalsdkasdj :3 >//<    🏳️‍⚧️[100, 100]
+  aa :3 mreow >//<                         🏳️‍⚧️[100, 100] "e"
+  asdfkjhsl :3 >////< meow mrrp            🏳️‍⚧️[100, 108] "l" "l"
+  waow :3 yip                              🏳️‍⚧️[100] "o"
+  asdkljfhasdklufhasdfasdhjflkjahld >////< 🏳️‍⚧️[100, 32, 32, 32]
+  wlsdkjfhaioua :3 meow mrrp >w< >//<      🏳️‍⚧️[32, 100, 100] "," " "
+  fsdklfakl :3 >//<                        🏳️‍⚧️[32, 100, 108, 108]
+  mkasdpfoasik :3 yip >//<                 🏳️‍⚧️[32, 100, 108, 108] "w"
+  bleh :3 mreow >//<                       🏳️‍⚧️[32, 100, 108, 108] "o"
+  asdlkvj :3 meow mrrp mreow               🏳️‍⚧️[32] "r" "l" "d"
+  um :3 mrrp >.<                           🏳️‍⚧️[] "!"
+
+hawwo 👉👈
