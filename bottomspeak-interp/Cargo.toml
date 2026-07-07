@@ -1,0 +1,12 @@
+[package]
+name = "bottomspeak-interp"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+codespan = "0.13.1"
+codespan-reporting = "0.13.1"
+owo-colors = "4.3.0"
+bottomspeak-macros = { path = "../bottomspeak-macros" }
+rand = "0.10.2"
+crossterm = "0.29.0"
