@@ -6,9 +6,7 @@ use std::error::Error;
 
 use super::*;
 
-type Result<T> = std::result::Result<T, Box<dyn Error>>;
-
-fn lex(source: &str) -> Result<TokenStream> {
+fn lex(source: &str) -> crate::Result<TokenStream> {
     let mut ctx = SourceContext::new(source, "<test>")?;
 
     let mut lexer = Lexer::new(&mut ctx);
@@ -17,7 +15,7 @@ fn lex(source: &str) -> Result<TokenStream> {
 }
 
 #[test]
-fn test_lexing() -> Result<()> {
+fn test_lexing() -> crate::Result<()> {
     let source = indoc! {r#"
         haiii 🥺
             afogjqwefokadj;flkadjsf;lkad :333 >////< >w< 🏳️‍⚧️ [23, 23, 23]
@@ -31,7 +29,10 @@ fn test_lexing() -> Result<()> {
         ts.inner(),
         &vec![
             Token {
-                kind: TokenType::Keysmash { len: 5 },
+                kind: TokenType::Keysmash {
+                    lowercase: true,
+                    len: 5
+                },
                 lexeme: "haiii".to_string(),
                 range: (0..5).into()
             },
@@ -41,17 +42,26 @@ fn test_lexing() -> Result<()> {
                 range: (6..10).into()
             },
             Token {
-                kind: TokenType::Keysmash { len: 14 },
+                kind: TokenType::Keysmash {
+                    lowercase: true,
+                    len: 14
+                },
                 lexeme: "afogjqwefokadj".to_string(),
                 range: (15..29).into()
             },
             Token {
-                kind: TokenType::Keysmash { len: 8 },
+                kind: TokenType::Keysmash {
+                    lowercase: true,
+                    len: 8
+                },
                 lexeme: "flkadjsf".to_string(),
                 range: (30..38).into()
             },
             Token {
-                kind: TokenType::Keysmash { len: 4 },
+                kind: TokenType::Keysmash {
+                    lowercase: true,
+                    len: 4
+                },
                 lexeme: "lkad".to_string(),
                 range: (39..43).into()
             },
@@ -91,7 +101,10 @@ fn test_lexing() -> Result<()> {
                 range: (105..128).into()
             },
             Token {
-                kind: TokenType::Keysmash { len: 11 },
+                kind: TokenType::Keysmash {
+                    lowercase: true,
+                    len: 11
+                },
                 lexeme: "adlkadlfdla".to_string(),
                 range: (133..144).into()
             },

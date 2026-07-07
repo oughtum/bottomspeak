@@ -138,4 +138,42 @@ pub(crate) enum ErrorKind {
         interp_title: String,
         petname: String,
     },
+
+    #[msg(
+        "{interp_title} thinks your enthusiasm is adorable but keysmashes can't be longer than 255 characters, okay {petname}? mwah~"
+    )]
+    #[code(0004)]
+    OverlongKeysmash {
+        interp_title: String,
+        petname: String,
+    },
+
+    /// Vm
+    #[msg(
+        "oh you're a very talkative {praise_honorific} aren't you? unfortunately {interp_title}'s stack isn't infinite, so I think my good little {praise_honorific} should shush now~"
+    )]
+    #[code(0005)]
+    ReachedStackLimit {
+        praise_honorific: String,
+        interp_title: String,
+    },
+
+    #[msg(
+        "oh {petname}, there aren't enough elements on the stack to {op}, could you try again for {interp_title}?~"
+    )]
+    #[code(0006)]
+    InsufficientElements {
+        op: String,
+        petname: String,
+        interp_title: String,
+    },
+
+    #[msg(
+        "sorry {petname}, unicode characters are in the range 0x000000-0x10FFFF, git it another go for {interp_title} okay?~"
+    )]
+    #[code(0007)]
+    InvalidCodepoint {
+        petname: String,
+        interp_title: String,
+    },
 }

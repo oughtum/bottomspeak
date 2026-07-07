@@ -5,36 +5,41 @@ use crossterm::{
 };
 use owo_colors::OwoColorize;
 
-use crate::{env::EnvVars, lexer::Lexer, source::SourceContext};
+use crate::{
+    env::EnvVars,
+    lexer::Lexer,
+    source::SourceContext,
+    vm::{Op, OpCode, Vm},
+};
 use std::{
     collections::BTreeMap,
-    error::Error,
     fmt,
     io::{Write, stdin, stdout},
     sync::LazyLock,
 };
 
-pub fn run(source: &str, name: &str) -> Result<(), Box<dyn Error>> {
+pub fn run(source: &str, name: &str) -> crate::Result<()> {
     let mut ctx = SourceContext::new(source, name)?;
 
     let mut lexer = Lexer::new(&mut ctx);
     lexer.lex_tokens();
-    // println!("{:?}", lexer.tokens());
 
     if ctx.err_occurred() {
-        let mut name = ctx.rand_interp_title().to_string();
-        let name = format!("{}{}", name.remove(0).to_uppercase(), name);
-
         ctx.output_errors()?;
-        println!(
-            "{}{}{}{}{}{}",
-            name.magenta(),
-            " found some errors in your code but it's okay, ".magenta(),
-            ctx.rand_petname().magenta(),
-            ", ".magenta(),
-            ctx.rand_interp_title().magenta(),
-            " believes in you <3\n".magenta(),
-        );
+        return Ok(());
+    }
+
+    let bytecode = vec![
+        Op::new(OpCode::Push(2), 0..0),
+        Op::new(OpCode::Push(3), 0..0),
+        Op::new(OpCode::Add, 0..0),
+    ];
+
+    let mut vm = Vm::new(&mut ctx, bytecode);
+    vm.run()?;
+
+    if ctx.err_occurred() {
+        ctx.output_errors()?;
         return Ok(());
     }
 
@@ -58,7 +63,7 @@ static REPL_CMDS: LazyLock<BTreeMap<char, ReplCmd>> = LazyLock::new(|| {
         ('c', ReplCmd::Clear),
     ])
 });
-pub fn repl() -> Result<(), Box<dyn Error>> {
+pub fn repl() -> crate::Result<()> {
     let env_vars = EnvVars::new();
 
     println!(
@@ -134,7 +139,7 @@ pub fn repl() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn handle_repl_cmd(cmd: ReplCmd, state: &mut ReplState) -> Result<(), Box<dyn Error>> {
+fn handle_repl_cmd(cmd: ReplCmd, state: &mut ReplState) -> crate::Result<()> {
     match cmd {
         ReplCmd::Quit => {
             state.src = String::new();

@@ -244,6 +244,17 @@ impl<'lx> Lexer<'lx> {
                 return TokenType::Error;
             }
 
+            if len == u8::MAX {
+                self.ctx.report(diagnostic!(
+                    ErrorKind::OverlongKeysmash {
+                        interp_title: self.ctx.rand_interp_title().into(),
+                        petname: self.ctx.rand_petname().into()
+                    },
+                    labels = [(self.byte_range(), "")]
+                ));
+                return TokenType::Error;
+            }
+
             len += 1;
         }
 
@@ -267,6 +278,17 @@ impl<'lx> Lexer<'lx> {
         let mut len = 0;
 
         while self.matches('3') {
+            if len == u8::MAX {
+                self.ctx.report(diagnostic!(
+                    ErrorKind::OverlongKeysmash {
+                        interp_title: self.ctx.rand_interp_title().into(),
+                        petname: self.ctx.rand_petname().into()
+                    },
+                    labels = [(self.byte_range(), "")]
+                ));
+                return TokenType::Error;
+            }
+
             len += 1;
         }
 
@@ -319,6 +341,8 @@ impl<'lx> Lexer<'lx> {
 
     /// Lexes a keysmash.
     fn lex_keysmash(&mut self, start: char) {
+        let lowercase = start.is_lowercase();
+
         if !self.is_valid_keysmash_char(start) {
             self.ctx.report(diagnostic!(
                 ErrorKind::UnexpectedToken {
@@ -336,9 +360,24 @@ impl<'lx> Lexer<'lx> {
 
         while let Some(char) = self.peek() {
             if self.is_valid_keysmash_char(char) {
-                self.next();
-                len += 1;
-                continue;
+                if lowercase == char.is_lowercase() {
+                    if len == u8::MAX {
+                        self.ctx.report(diagnostic!(
+                            ErrorKind::OverlongKeysmash {
+                                interp_title: self.ctx.rand_interp_title().into(),
+                                petname: self.ctx.rand_petname().into()
+                            },
+                            labels = [(self.byte_range(), "")]
+                        ));
+                        return self.tokenise(TokenType::Error, self.lexeme());
+                    }
+
+                    len += 1;
+                    self.next();
+                    continue;
+                }
+
+                return self.tokenise(TokenType::Keysmash { lowercase, len }, self.lexeme());
             }
 
             break;
@@ -351,7 +390,7 @@ impl<'lx> Lexer<'lx> {
                 utf: self.matches('~'),
             }
         } else {
-            TokenType::Keysmash { len }
+            TokenType::Keysmash { lowercase, len }
         };
 
         self.tokenise(token, lexeme);

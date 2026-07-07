@@ -37,11 +37,11 @@ pub(crate) enum TokenType {
     BlushW,
     /// '`:3`'
     ColonThree {
-        len: u16,
+        len: u8,
     },
     /// '`>//<`'
     BlushSlash {
-        len: u16,
+        len: u8,
     },
     /// '`>.<`'
     BlushDot,
@@ -51,7 +51,8 @@ pub(crate) enum TokenType {
     Point,
     /// '`asdlfjhalfadlfkj`'
     Keysmash {
-        len: u16,
+        lowercase: bool,
+        len: u8,
     },
     Print {
         utf: bool,

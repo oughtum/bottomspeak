@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, error};
+use std::cmp::Ordering;
 
 use codespan_reporting::{
     files::{self, Error, Files, line_starts},
@@ -7,6 +7,7 @@ use codespan_reporting::{
         termcolor::{Color, ColorChoice, ColorSpec, StandardStream},
     },
 };
+use owo_colors::OwoColorize;
 
 use crate::{diagnostic::Diagnostic, env::EnvVars};
 
@@ -19,7 +20,7 @@ pub(crate) struct SourceContext {
 }
 
 impl SourceContext {
-    pub(crate) fn new(source: &str, name: &str) -> Result<Self, Box<dyn error::Error>> {
+    pub(crate) fn new(source: &str, name: &str) -> crate::Result<Self> {
         let line_starts = line_starts(source).collect();
 
         Ok(Self {
@@ -105,6 +106,19 @@ impl SourceContext {
                 &diagnostic.to_codespan_diagnostic(),
             )?;
         }
+
+        let mut name = self.rand_interp_title().to_string();
+        let name = format!("{}{}", name.remove(0).to_uppercase(), name);
+
+        println!(
+            "{}{}{}{}{}{}",
+            name.magenta(),
+            " found some errors in your code but it's okay, ".magenta(),
+            self.rand_petname().magenta(),
+            ", ".magenta(),
+            self.rand_interp_title().magenta(),
+            " believes in you <3\n".magenta(),
+        );
 
         Ok::<(), files::Error>(())
     }
