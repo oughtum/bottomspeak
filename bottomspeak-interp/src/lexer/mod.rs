@@ -7,6 +7,7 @@ use crate::{
     source::SourceContext,
 };
 
+pub(crate) mod tests;
 pub(crate) mod token;
 
 pub(crate) struct Lexer<'lx> {
@@ -236,7 +237,7 @@ impl<'lx> Lexer<'lx> {
             return TokenType::Error;
         }
 
-        let mut len = 0;
+        let mut len = 1;
 
         while self.matches('/') {
             if !check_double_slash(self) {
