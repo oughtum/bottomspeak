@@ -73,8 +73,6 @@ pub fn repl() -> Result<(), Box<dyn Error>> {
     let mut state = ReplState::default();
     let mut stdout = stdout();
 
-    clear_screen(false);
-
     loop {
         if state.quit {
             break;
@@ -154,23 +152,19 @@ fn handle_repl_cmd(cmd: ReplCmd, state: &mut ReplState) -> Result<(), Box<dyn Er
         }
         ReplCmd::Clear => {
             state.src = String::new();
-            clear_screen(true);
+            clear_screen();
         }
     }
 
     Ok(())
 }
 
-fn clear_screen(full: bool) {
+fn clear_screen() {
     let mut out = stdout();
     out.queue(Hide).unwrap();
 
-    if full {
-        out.queue(Clear(ClearType::All)).unwrap();
-        out.queue(MoveTo(0, 0)).unwrap();
-    } else {
-        out.queue(Clear(ClearType::Purge)).unwrap();
-    }
+    out.queue(Clear(ClearType::All)).unwrap();
+    out.queue(MoveTo(0, 0)).unwrap();
 
     out.flush().unwrap();
 }
