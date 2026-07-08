@@ -76,6 +76,8 @@ dependencies = [
 [[package]]
 name = "bottomspeak-macros"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "044089c0a7cc4458e94b58a7f63df07b0ee3807693d5f6d9e835616ebc0c5ef4"
 dependencies = [
  "codespan-reporting",
  "quote",
