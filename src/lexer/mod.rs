@@ -129,7 +129,9 @@ impl<'lx> Lexer<'lx> {
     ///
     /// [`chars`]: Lexer::chars
     /// [`TokenStream`]: crate::lexer::token::TokenStream
-    pub(crate) fn lex_tokens(&mut self) {
+    pub(crate) fn lex_tokens(&mut self, in_repl: bool) {
+        let mut has_comments = false;
+
         while let Some(char) = self.next() {
             let token_type = match char {
                 '>' => self.lex_emoticon(),
@@ -151,6 +153,7 @@ impl<'lx> Lexer<'lx> {
                 }
                 '🏳' => {
                     self.lex_comment();
+                    has_comments = true;
                     continue;
                 }
                 c if c.is_whitespace() || c == ';' => {
@@ -165,6 +168,17 @@ impl<'lx> Lexer<'lx> {
             };
 
             self.tokenise(token_type, self.lexeme());
+        }
+
+        if !has_comments && !in_repl {
+            self.ctx.report(diagnostic!(
+                ErrorKind::UncommentedSource {
+                    interp_title: self.ctx.rand_interp_title().into(),
+                    petname: self.ctx.rand_petname().into(),
+                    praise_term: self.ctx.rand_praise_term().into(),
+                },
+                labels = [(self.byte_range(), "")]
+            ))
         }
 
         self.tokenise(TokenType::Eof, '\0'.into());

@@ -11,7 +11,7 @@ fn test_runtime_eval() -> crate::Result<()> {
     let mut ctx = SourceContext::new("", "<test>")?;
 
     let mut lexer = Lexer::new(&mut ctx);
-    lexer.lex_tokens();
+    lexer.lex_tokens(true);
 
     let mut sub = Subroutine::default();
     sub.emit_op(Op::new(OpCode::Push(8), 0..0));

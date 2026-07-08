@@ -17,7 +17,7 @@ pub fn run(source: &str, name: &str) -> crate::Result<()> {
     let mut ctx = SourceContext::new(source, name)?;
 
     let mut lexer = Lexer::new(&mut ctx);
-    lexer.lex_tokens();
+    lexer.lex_tokens(name == "<repl>");
     let tokens = lexer.tokens();
 
     if ctx.err_occurred() {

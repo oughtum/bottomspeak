@@ -9,7 +9,7 @@ fn lex(source: &str) -> crate::Result<TokenStream> {
     let mut ctx = SourceContext::new(source, "<test>")?;
 
     let mut lexer = Lexer::new(&mut ctx);
-    lexer.lex_tokens();
+    lexer.lex_tokens(true);
     Ok(lexer.tokens())
 }
 

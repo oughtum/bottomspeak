@@ -113,7 +113,6 @@ pub(crate) enum ErrorKind {
         praise_term: String,
     },
 
-    // Lexer
     #[msg(
         "sorry {petname}, {interp_title} doesn't need the character `{char}`, could you be ever such a good {praise_term} and remove it for me~"
     )]
@@ -149,7 +148,6 @@ pub(crate) enum ErrorKind {
         petname: String,
     },
 
-    /// Parser
     #[msg("come on, be a good {praise_term} and use your words for {interp_title}~")]
     #[code(0005)]
     EmptySource {
@@ -188,7 +186,6 @@ pub(crate) enum ErrorKind {
     #[code(0009)]
     NestedSubroutine { interp_title: String },
 
-    /// Runtime
     #[msg(
         "oh you're a very talkative {praise_term} aren't you? unfortunately {interp_title}'s stack isn't infinite, so I think my adorable {praise_term} should shush now~"
     )]
@@ -225,5 +222,15 @@ pub(crate) enum ErrorKind {
         name: String,
         interp_title: String,
         petname: String,
+    },
+
+    #[msg(
+        "{interp_title} needs some help understanding your code, {petname}, be a good {praise_term} and add some comments~"
+    )]
+    #[code(0014)]
+    UncommentedSource {
+        interp_title: String,
+        petname: String,
+        praise_term: String,
     },
 }

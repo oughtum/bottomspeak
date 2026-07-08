@@ -15,6 +15,8 @@ These are how you push values to the stack. They can have a maximum length of 12
 
 For example, `asdfglaskdjh` has a length of 12 characters and thus is encoded as the value 11 in decimal because lowercase keysmashes start at 0, while `AKSDJHFPAOISDUJASDLKFJOI` has a length of 24 characters and thus is encoded as the value 151 because uppercase keysmashes start at 128.
 
+Ordinarily, keysmashes must be separated by whitespace or a different case, otherwise they get parsed as a single keysmash, but it's also possible to use semicolons (`;`) to delimit them as they are also a common keysmash character e.g. `asdlkj dfkgjhasdo` == `asdlkj;dfkgjhasdo` and `sdlkjBAKLSDJ` == `sdlkj BAKLSDJ` == `sdlkj;BAKLSDJ`.
+
 ### Instructions
 
 BottomSpeak features several instructions for simple stack manipulation:
