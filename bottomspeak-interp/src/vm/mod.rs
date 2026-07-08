@@ -4,9 +4,11 @@ use std::{
     range::Range,
 };
 
-use crate::{diagnostic, diagnostic::ErrorKind, source::SourceContext};
+use crate::{diagnostic, diagnostics::ErrorKind, source::SourceContext};
 
 pub(crate) mod tests;
+
+pub(crate) const INTERNAL_ROOT_SUBROUTINE: &str = "__root";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Register(pub(crate) usize);
@@ -28,6 +30,7 @@ impl DerefMut for Register {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum OpCode {
     Push(u8),
+    Pop,
     Swap,
     Add,
     Print,
@@ -100,27 +103,12 @@ pub(crate) struct Vm<'vm> {
 }
 
 impl<'vm> Vm<'vm> {
-    pub(crate) fn new(ctx: &'vm mut SourceContext, mut submap: SubroutineMap) -> Self {
-        // the first subroutine that's defined gets used as the entry point
-        let (main_sub, _) = submap.first_key_value().unwrap();
-
-        // create an internal root subroutine that actually calls the main subroutine
-        let root_name = "_root".to_string();
-        submap.insert(
-            root_name.clone(),
-            Subroutine {
-                bytecode: vec![
-                    Op::new(OpCode::Jump(main_sub.clone()), 0..0),
-                    Op::new(OpCode::Return, 0..0),
-                ],
-            },
-        );
-
+    pub(crate) fn new(ctx: &'vm mut SourceContext, submap: SubroutineMap) -> Self {
         Self {
             ctx,
             stack: Vec::new(),
             submap,
-            frames: vec![CallFrame::new(root_name)],
+            frames: vec![CallFrame::new(INTERNAL_ROOT_SUBROUTINE.to_string())],
             printed_output: String::new(),
         }
     }
@@ -148,7 +136,7 @@ impl<'vm> Vm<'vm> {
 
             if *frame.ins_ptr == u16::MAX as usize {
                 self.ctx.report(diagnostic!(ErrorKind::ReachedStackLimit {
-                    praise_honorific: self.ctx.rand_praise_honorific().into(),
+                    praise_term: self.ctx.rand_praise_term().into(),
                     interp_title: self.ctx.rand_interp_title().into(),
                 }));
                 break;
@@ -180,6 +168,9 @@ impl<'vm> Vm<'vm> {
 
             match &op.code {
                 OpCode::Push(val) => self.stack.push(*val),
+                OpCode::Pop => {
+                    self.stack.pop();
+                }
                 OpCode::Swap => {
                     let current = self.stack.pop();
                     let prev = self.stack.pop();
@@ -207,7 +198,7 @@ impl<'vm> Vm<'vm> {
                     if let Some(current) = current
                         && let Some(prev) = prev
                     {
-                        self.stack.push(current + prev);
+                        self.stack.push(current.wrapping_add(prev));
                     } else {
                         self.ctx.report(diagnostic!(
                             ErrorKind::InsufficientElements {
@@ -236,16 +227,16 @@ impl<'vm> Vm<'vm> {
                     }
                 }
                 OpCode::PrintUtf => {
-                    let byte3 = self.stack.pop();
-                    let byte2 = self.stack.pop();
                     let byte1 = self.stack.pop();
+                    let byte2 = self.stack.pop();
+                    let byte3 = self.stack.pop();
 
-                    if let Some(byte3) = byte3
+                    if let Some(byte1) = byte1
                         && let Some(byte2) = byte2
-                        && let Some(byte1) = byte1
+                        && let Some(byte3) = byte3
                     {
                         let bytes = [byte1, byte2, byte3, 0x00];
-                        let codepoint = u32::from_be_bytes(bytes);
+                        let codepoint = u32::from_le_bytes(bytes);
 
                         if let Some(char) = char::from_u32(codepoint) {
                             self.printed_output.push(char);

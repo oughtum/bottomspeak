@@ -5,14 +5,14 @@ use rand::{rngs::SmallRng, seq::IndexedRandom};
 pub(crate) const DEFAULT_INTERP_TITLES: [&str; 1] = ["mommy"];
 pub(crate) const DEFAULT_PETNAMES: [&str; 5] =
     ["sweetheart", "sweetie", "cutie", "darling", "honey"];
-pub(crate) const DEFAULT_PRAISE_HONORIFICS: [&str; 2] = ["girl", "pet"];
+pub(crate) const DEFAULT_PRAISE_TERMS: [&str; 2] = ["girl", "pet"];
 pub(crate) const DEFAULT_PRINT_KEYWORDS: [&str; 6] =
     ["meow", "mreow", "mrrp", "woof", "wruff", "yip"];
 
 pub(crate) struct EnvVars {
     pub(crate) interp_titles: Vec<String>,
     pub(crate) petnames: Vec<String>,
-    pub(crate) praise_honorifics: Vec<String>,
+    pub(crate) praise_terms: Vec<String>,
     pub(crate) print_keywords: Vec<String>,
 }
 
@@ -24,10 +24,7 @@ impl EnvVars {
                 &DEFAULT_INTERP_TITLES,
             ),
             petnames: get_env_strings("BOTTOMSPEAK_PETNAMES", &DEFAULT_PETNAMES),
-            praise_honorifics: get_env_strings(
-                "BOTTOMSPEAK_PRAISE_HONORIFICS",
-                &DEFAULT_PRAISE_HONORIFICS,
-            ),
+            praise_terms: get_env_strings("BOTTOMSPEAK_PRAISE_TERMS", &DEFAULT_PRAISE_TERMS),
             print_keywords: get_env_strings("BOTTOMSPEAK_PRINT_KEYWORDS", &DEFAULT_PRINT_KEYWORDS),
         }
     }
@@ -44,10 +41,10 @@ impl EnvVars {
         self.petnames.choose(&mut rng).unwrap()
     }
 
-    /// Samples a random praise honorific.
-    pub(crate) fn rand_praise_honorific(&self) -> &str {
+    /// Samples a random praise term.
+    pub(crate) fn rand_praise_term(&self) -> &str {
         let mut rng = rand::make_rng::<SmallRng>();
-        self.praise_honorifics.choose(&mut rng).unwrap()
+        self.praise_terms.choose(&mut rng).unwrap()
     }
 }
 

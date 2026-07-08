@@ -8,17 +8,26 @@ impl TokenStream {
         self.0.push(tok);
     }
 
+    #[cfg(test)]
     pub(crate) fn inner(&self) -> &Vec<Token> {
         &self.0
+    }
+
+    pub(crate) fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub(crate) fn get(&self, idx: usize) -> Option<&Token> {
+        self.0.get(idx)
     }
 }
 
 /// Represents a single token.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct Token {
-    pub(crate) kind: TokenType,
-    pub(crate) lexeme: String,
-    pub(crate) range: Range<usize>,
+    kind: TokenType,
+    lexeme: String,
+    range: Range<usize>,
 }
 
 impl Token {
@@ -29,24 +38,40 @@ impl Token {
             range: range.into(),
         }
     }
+
+    pub(crate) fn kind(&self) -> TokenType {
+        self.kind
+    }
+
+    pub(crate) fn lexeme(&self) -> &str {
+        &self.lexeme
+    }
+
+    pub(crate) fn range(&self) -> Range<usize> {
+        self.range
+    }
+
+    pub(crate) fn end(&self) -> usize {
+        self.range.end
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) enum TokenType {
     /// '`>w<`'
-    BlushW,
+    FlusteredW,
     /// `'>~<'`
-    BlushTilde,
+    FlusteredTilde,
     /// '`:3`'
     ColonThree {
         len: u8,
     },
     /// '`>//<`'
-    BlushSlash {
+    Blush {
         len: u8,
     },
     /// '`>.<`'
-    BlushDot,
+    FlusteredDot,
     /// '🥺'
     Sub,
     /// '👉👈'
@@ -59,8 +84,6 @@ pub(crate) enum TokenType {
     Print {
         utf: bool,
     },
-    /// '`🏳️‍⚧️this is a comment :3`'
-    Comment,
     Error,
     /// '`\0`'
     Eof,

@@ -9,7 +9,7 @@ use codespan_reporting::{
 };
 use owo_colors::OwoColorize;
 
-use crate::{diagnostic::Diagnostic, env::EnvVars};
+use crate::{diagnostics::Diagnostic, env::EnvVars};
 
 pub(crate) struct SourceContext {
     pub(crate) source: String,
@@ -47,9 +47,9 @@ impl SourceContext {
         self.env_vars.rand_petname()
     }
 
-    /// Samples a random praise honorific.
-    pub(crate) fn rand_praise_honorific(&self) -> &str {
-        self.env_vars.rand_praise_honorific()
+    /// Samples a random praise term.
+    pub(crate) fn rand_praise_term(&self) -> &str {
+        self.env_vars.rand_praise_term()
     }
 
     pub(crate) fn err_occurred(&self) -> bool {
@@ -98,15 +98,6 @@ impl SourceContext {
             after_label_lines: 2,
         };
 
-        for diagnostic in self.diagnostics.iter() {
-            term::emit_to_write_style(
-                &mut writer,
-                &config,
-                self,
-                &diagnostic.to_codespan_diagnostic(),
-            )?;
-        }
-
         let mut name = self.rand_interp_title().to_string();
         let name = format!("{}{}", name.remove(0).to_uppercase(), name);
 
@@ -119,6 +110,15 @@ impl SourceContext {
             self.rand_interp_title().magenta(),
             " believes in you <3\n".magenta(),
         );
+
+        for diagnostic in self.diagnostics.iter() {
+            term::emit_to_write_style(
+                &mut writer,
+                &config,
+                self,
+                &diagnostic.to_codespan_diagnostic(),
+            )?;
+        }
 
         Ok::<(), files::Error>(())
     }

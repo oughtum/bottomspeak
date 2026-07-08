@@ -2,13 +2,15 @@ use std::range::Range;
 
 use crate::{
     diagnostic,
-    diagnostic::ErrorKind,
+    diagnostics::ErrorKind,
     lexer::token::{Token, TokenStream, TokenType},
     source::SourceContext,
 };
 
 pub(crate) mod tests;
 pub(crate) mod token;
+
+pub(crate) const KEYSMASH_MAX_LEN: u8 = 128;
 
 pub(crate) struct Lexer<'lx> {
     /// A reference to the full context for the source.
@@ -147,7 +149,10 @@ impl<'lx> Lexer<'lx> {
                         TokenType::Error
                     }
                 }
-                '🏳' => self.lex_comment(),
+                '🏳' => {
+                    self.lex_comment();
+                    continue;
+                }
                 c if c.is_whitespace() || c == ';' => {
                     self.start = self.current;
                     self.start_byte = self.current_byte;
@@ -171,7 +176,7 @@ impl<'lx> Lexer<'lx> {
                 self.next();
 
                 if self.matches('<') {
-                    TokenType::BlushW
+                    TokenType::FlusteredW
                 } else {
                     self.ctx.report(diagnostic!(
                         ErrorKind::UnfinishedEmoticon {
@@ -186,7 +191,7 @@ impl<'lx> Lexer<'lx> {
             Some('~') => {
                 self.next();
                 if self.matches('<') {
-                    TokenType::BlushTilde
+                    TokenType::FlusteredTilde
                 } else {
                     self.ctx.report(diagnostic!(
                         ErrorKind::UnfinishedEmoticon {
@@ -206,7 +211,7 @@ impl<'lx> Lexer<'lx> {
                 self.next();
 
                 if self.matches('<') {
-                    TokenType::BlushDot
+                    TokenType::FlusteredDot
                 } else {
                     self.ctx.report(diagnostic!(
                         ErrorKind::UnfinishedEmoticon {
@@ -260,7 +265,7 @@ impl<'lx> Lexer<'lx> {
                 return TokenType::Error;
             }
 
-            if len == u8::MAX {
+            if len == KEYSMASH_MAX_LEN {
                 self.ctx.report(diagnostic!(
                     ErrorKind::OverlongKeysmash {
                         interp_title: self.ctx.rand_interp_title().into(),
@@ -275,7 +280,7 @@ impl<'lx> Lexer<'lx> {
         }
 
         if self.matches('<') {
-            return TokenType::BlushSlash { len };
+            return TokenType::Blush { len };
         }
 
         self.ctx.report(diagnostic!(
@@ -294,7 +299,7 @@ impl<'lx> Lexer<'lx> {
         let mut len = 0;
 
         while self.matches('3') {
-            if len == u8::MAX {
+            if len == KEYSMASH_MAX_LEN {
                 self.ctx.report(diagnostic!(
                     ErrorKind::OverlongKeysmash {
                         interp_title: self.ctx.rand_interp_title().into(),
@@ -323,7 +328,7 @@ impl<'lx> Lexer<'lx> {
     }
 
     /// Lexes an inline comment.
-    fn lex_comment(&mut self) -> TokenType {
+    fn lex_comment(&mut self) {
         fn check_trans_flag_glyphs(this: &mut Lexer, glyph: char) -> bool {
             let valid = this.matches(glyph);
 
@@ -332,7 +337,7 @@ impl<'lx> Lexer<'lx> {
                     ErrorKind::UnexpectedToken {
                         petname: this.ctx.rand_petname().into(),
                         interp_title: this.ctx.rand_interp_title().into(),
-                        praise_honorific: this.ctx.rand_praise_honorific().into(),
+                        praise_term: this.ctx.rand_praise_term().into(),
                         char: glyph,
                     },
                     labels = [(this.range(), "")]
@@ -344,15 +349,13 @@ impl<'lx> Lexer<'lx> {
 
         for glyph in ['\u{fe0f}', '\u{200d}', '\u{26a7}', '\u{fe0f}'] {
             if !check_trans_flag_glyphs(self, glyph) {
-                return TokenType::Error;
+                return self.tokenise(TokenType::Error, self.lexeme());
             }
         }
 
         while self.peek().is_some_and(|peek| peek != '\n') {
             self.next();
         }
-
-        TokenType::Comment
     }
 
     /// Lexes a keysmash.
@@ -364,7 +367,7 @@ impl<'lx> Lexer<'lx> {
                 ErrorKind::UnexpectedToken {
                     petname: self.ctx.rand_petname().into(),
                     interp_title: self.ctx.rand_interp_title().into(),
-                    praise_honorific: self.ctx.rand_praise_honorific().into(),
+                    praise_term: self.ctx.rand_praise_term().into(),
                     char: start
                 },
                 labels = [(self.byte_range(), "")]
@@ -377,7 +380,7 @@ impl<'lx> Lexer<'lx> {
         while let Some(char) = self.peek() {
             if self.is_valid_keysmash_char(char) {
                 if lowercase == char.is_lowercase() {
-                    if len == u8::MAX {
+                    if len == KEYSMASH_MAX_LEN {
                         self.ctx.report(diagnostic!(
                             ErrorKind::OverlongKeysmash {
                                 interp_title: self.ctx.rand_interp_title().into(),

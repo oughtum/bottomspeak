@@ -5,12 +5,7 @@ use crossterm::{
 };
 use owo_colors::OwoColorize;
 
-use crate::{
-    env::EnvVars,
-    lexer::Lexer,
-    source::SourceContext,
-    vm::{Op, OpCode, Subroutine, Vm},
-};
+use crate::{env::EnvVars, lexer::Lexer, parser::Parser, source::SourceContext, vm::Vm};
 use std::{
     collections::BTreeMap,
     fmt,
@@ -23,16 +18,25 @@ pub fn run(source: &str, name: &str) -> crate::Result<()> {
 
     let mut lexer = Lexer::new(&mut ctx);
     lexer.lex_tokens();
+    let tokens = lexer.tokens();
 
     if ctx.err_occurred() {
         ctx.output_errors()?;
         return Ok(());
     }
 
-    let submap = BTreeMap::new();
+    let mut parser = Parser::new(tokens, &mut ctx);
+    parser.parse();
+    let submap = parser.submap;
+
+    if ctx.err_occurred() {
+        ctx.output_errors()?;
+        return Ok(());
+    }
 
     let mut vm = Vm::new(&mut ctx, submap);
     vm.run()?;
+    let output = vm.printed_output;
 
     if ctx.err_occurred() {
         ctx.output_errors()?;
@@ -45,8 +49,10 @@ pub fn run(source: &str, name: &str) -> crate::Result<()> {
         ctx.rand_interp_title().magenta(),
         " is so proud of you, ".magenta(),
         ctx.rand_petname().magenta(),
-        " <3".magenta(),
+        " <3\n".magenta(),
     );
+
+    println!("{}", output);
 
     Ok(())
 }
@@ -101,7 +107,7 @@ pub fn repl() -> crate::Result<()> {
             println!(
                 "{}{}{}{}{}",
                 "Be a good ".yellow(),
-                env_vars.rand_praise_honorific().yellow(),
+                env_vars.rand_praise_term().yellow(),
                 " and use your words to tell ".yellow(),
                 env_vars.rand_interp_title().yellow(),
                 " what you want me to do~".yellow()
