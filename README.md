@@ -91,6 +91,11 @@ There are several behaviours which can be customised through environment variabl
 
 All of these can be overriden when running the interpreter by simply passing them in on the commandline. Multiple potential values can be used by separating them with slashes (`/`) and then a random one is chosen from the pool each time, with the exception of `DEFAULT_PRINT_KEYWORDS` where all options are always valid.
 
+## REPL
+
+BottomSpeak also features an interactive REPL so you can play around with the language with ease.
+It includes a few basic commands which should be enough for simple programs.
+
 ## Installation
 
 BottomSpeak is available through cargo, simply run `cargo install bottomspeak` and you're done :3
