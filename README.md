@@ -17,10 +17,10 @@ For example, `asdfglaskdjh` has a length of 12 characters and thus is encoded as
 
 BottomSpeak features several instructions for simple stack manipulation:
 
-- `>~<` - Pops the top value from the stack and discards it
-- `>w<` - Swaps the last two items on the stack
+- `>~<` - Pops the top value from the stack and discards it.
+- `>w<` - Swaps the last two items on the stack.
 - `:3` - Pops the last two values on the stack, adds them together and pushes the result back to the stack. Subtraction can also be achieved using overflow behaviour. Multiple values can be added together at once by simply repeating the `3` e.g. `:333` would add the top two stack values three times.
-- `>//<` - Duplicates the value at the top of the stack. The value can be duplicated multiple times just like with `:3` by repeating the `//` e.g. `>//////<` would duplicate the value three times
+- `>//<` - Duplicates the value at the top of the stack. The value can be duplicated multiple times just like with `:3` by repeating the `//` e.g. `>//////<` would duplicate the value three times.
 - `meow` - One of several [default keywords](#customisation) used for popping the top stack value and printing it as an ASCII character to stdout.
 - `meow~` - Similar functionality to regular printing, but instead pops the last three stack values, pads them with an extra zero byte & constructs a unicode codepoint to be printed. For example, a stack with values `[1, 249, 122]` would be `[0x01, 0xf9, 0x7a]` in hexadecimal (or `[0x00, 0x01, 0xf9, 0x7a]` with padding), and thus is converted to the unicode codepoint `u1f97a` (🥺).
 
