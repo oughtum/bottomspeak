@@ -62,16 +62,8 @@ checksum = "b4388bee8683e3d04af747c73422af53102d2bd24d9eadb6cbc100baef4b43f8"
 name = "bottomspeak"
 version = "0.1.0"
 dependencies = [
- "bottomspeak-interp",
  "bottomspeak-macros",
  "clap",
-]
-
-[[package]]
-name = "bottomspeak-interp"
-version = "0.1.0"
-dependencies = [
- "bottomspeak-macros",
  "codespan",
  "codespan-reporting",
  "crossterm",

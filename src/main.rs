@@ -1,7 +1,15 @@
+use clap::{Parser, Subcommand};
 use std::{error::Error, fs, path::PathBuf};
 
-use bottomspeak_interp::interpreter;
-use clap::{Parser, Subcommand};
+pub(crate) mod diagnostics;
+pub(crate) mod env;
+pub(crate) mod interpreter;
+pub(crate) mod lexer;
+pub(crate) mod parser;
+pub(crate) mod source;
+pub(crate) mod vm;
+
+pub(crate) type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 #[derive(clap::Parser)]
 #[command(about, disable_help_flag = true)]
@@ -21,7 +29,7 @@ pub enum Command {
     Repl,
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> crate::Result<()> {
     let args = Cli::parse();
 
     match args.command {

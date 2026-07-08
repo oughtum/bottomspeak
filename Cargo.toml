@@ -9,9 +9,13 @@ keywords = ["esolang", "trans"]
 
 [dependencies]
 clap = { version = "4.6.1", features = ["derive", "string"] }
-bottomspeak-interp = { path = "./bottomspeak-interp" }
-bottomspeak-macros = { path = "./bottomspeak-macros" }
+bottomspeak-macros = "0.1.0"
+codespan = "0.13.1"
+codespan-reporting = "0.13.1"
+owo-colors = "4.3.0"
+rand = "0.10.2"
+crossterm = "0.29.0"
 
-[workspace]
-resolver = "3"
-members = ["bottomspeak-interp", "bottomspeak-macros"]
+[dev-dependencies]
+indoc = "2.0.7"
+pretty_assertions = "1.4.1"
