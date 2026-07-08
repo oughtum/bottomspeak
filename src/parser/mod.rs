@@ -23,6 +23,9 @@ pub(crate) struct Parser<'p> {
     /// The index of the current [`Token`](crate::lexer::token::Token).
     current: usize,
 
+    /// The identifier for the current subroutine being parsed.
+    sub: String,
+
     /// A map of identifiers to parsed subroutines.
     pub(crate) submap: SubroutineMap,
 }
@@ -37,6 +40,7 @@ impl<'p> Parser<'p> {
             ctx,
             tokens,
             current: 0,
+            sub: INTERNAL_ROOT_SUBROUTINE.to_string(),
             submap,
         }
     }
@@ -90,8 +94,10 @@ impl<'p> Parser<'p> {
         let peek = self.peek();
         peek.is_none() || peek.is_some_and(|tok| tok.kind() == TokenType::Eof)
     }
+
+    /// Emit an instruction for the VM to execute.
     fn emit_op(&mut self, op: Op) {
-        if let Some((_, sub)) = self.submap.iter_mut().next_back() {
+        if let Some(sub) = self.submap.get_mut(&self.sub) {
             sub.emit_op(op);
         }
     }
@@ -108,16 +114,20 @@ impl<'p> Parser<'p> {
         }
 
         while !self.is_eof() {
-            if self.parse_instruction().is_none() {
+            if self.parse_instruction(true).is_none() {
                 break;
             }
         }
 
         let end = self.ctx.source.len();
-        self.emit_op(Op::new(OpCode::Return, end..end));
+
+        self.submap
+            .get_mut(INTERNAL_ROOT_SUBROUTINE)
+            .unwrap()
+            .emit_op(Op::new(OpCode::Return, end..end));
     }
 
-    fn parse_instruction(&mut self) -> Option<()> {
+    fn parse_instruction(&mut self, root: bool) -> Option<()> {
         if let Some(tok) = self.next() {
             let range = tok.range();
 
@@ -175,11 +185,22 @@ impl<'p> Parser<'p> {
                     };
 
                     if self.matches(TokenType::Sub) {
-                        return self.parse_subroutine(range.start);
+                        if !root {
+                            self.ctx.report(diagnostic!(
+                                ErrorKind::NestedSubroutine {
+                                    interp_title: self.ctx.rand_interp_title().into()
+                                },
+                                labels = [(range, "")]
+                            ));
+                            return Some(());
+                        }
+
+                        return self.parse_subroutine(ident, range.start);
                     }
 
                     if self.matches(TokenType::Point) {
-                        self.emit_op(Op::new(OpCode::Jump(ident), range))
+                        self.emit_op(Op::new(OpCode::Jump(ident), range));
+                        return Some(());
                     }
 
                     self.emit_op(Op::new(OpCode::Push(val), range))
@@ -203,7 +224,10 @@ impl<'p> Parser<'p> {
         Some(())
     }
 
-    fn parse_subroutine(&mut self, start: usize) -> Option<()> {
+    fn parse_subroutine(&mut self, ident: String, start: usize) -> Option<()> {
+        self.submap.insert(ident.clone(), Subroutine::default());
+        self.sub = ident;
+
         loop {
             let end = self.peekp()?.end();
 
@@ -219,10 +243,11 @@ impl<'p> Parser<'p> {
 
             if self.matches(TokenType::FlusteredDot) {
                 self.emit_op(Op::new(OpCode::Return, start..end));
+                self.sub = INTERNAL_ROOT_SUBROUTINE.to_string();
                 return Some(());
             }
 
-            self.parse_instruction();
+            self.parse_instruction(false);
         }
     }
 }

@@ -182,11 +182,17 @@ pub(crate) enum ErrorKind {
     #[code(0008)]
     SubWithoutReturn { interp_title: String },
 
+    #[msg(
+        "subroutines aren't allowed to be inside another subroutine, that's {interp_title}'s job~"
+    )]
+    #[code(0009)]
+    NestedSubroutine { interp_title: String },
+
     /// Runtime
     #[msg(
         "oh you're a very talkative {praise_term} aren't you? unfortunately {interp_title}'s stack isn't infinite, so I think my adorable {praise_term} should shush now~"
     )]
-    #[code(0009)]
+    #[code(0010)]
     ReachedStackLimit {
         praise_term: String,
         interp_title: String,
@@ -195,7 +201,7 @@ pub(crate) enum ErrorKind {
     #[msg(
         "oh {petname}, there aren't enough values on the stack to {op}, could you try again for {interp_title}?~"
     )]
-    #[code(0010)]
+    #[code(0011)]
     InsufficientElements {
         op: String,
         petname: String,
@@ -205,7 +211,7 @@ pub(crate) enum ErrorKind {
     #[msg(
         "sorry {petname}, unicode characters are in the range 0x000000-0x10FFFF, git it another go for {interp_title} okay?~"
     )]
-    #[code(0011)]
+    #[code(0012)]
     InvalidCodepoint {
         petname: String,
         interp_title: String,
@@ -214,7 +220,7 @@ pub(crate) enum ErrorKind {
     #[msg(
         "{name} couldn't find any subroutine called `{interp_title}`, but I know you can do better for me next time {petname} <3"
     )]
-    #[code(0012)]
+    #[code(0013)]
     UnresolvedSubroutine {
         name: String,
         interp_title: String,

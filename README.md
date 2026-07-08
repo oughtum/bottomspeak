@@ -1,11 +1,13 @@
 # BottomSpeak
 
-_BottomSpeak_ is the ultimate language for expressing yourself through programming. Expressions? Boring. Types? Who needs 'em?
+BottomSpeak is the ultimate language for expressing yourself through programming. Expressions? Boring. Types? Who needs 'em?
 Now you can program with the same kind of basic symbols you'd use when faced with even the slightest amount of dominance!
 
-_BottomSpeak_ is a stack-based language and as such has a very simple instruction set based around manipulating said stack.
+BottomSpeak is a stack-based language and as such has a very simple instruction set based around manipulating said stack.
 
 ## Language Syntax
+
+BottomSpeak does not require a specific file extension, so feel free to use whatever you like, or none at all! All examples in the repo will use the `uwu` extension simply because why not?
 
 ### Keysmashes
 
@@ -42,7 +44,11 @@ This will call the subroutine called `alsdkfkl` and begin doing as it's told lik
 
 ### Comments
 
-Comments are always inline and can be formed using the trans flag emoji '🏳️‍⚧️'.
+Comments are always inline and can be formed using the trans flag emoji '🏳️‍⚧️':
+
+```
+🏳️‍⚧️ Trans rights are human rights :3
+```
 
 ## Error Reporting
 
@@ -51,7 +57,7 @@ BottomSpeak is a silly language but that doesn't mean it can't have good error r
 ```
 Mommy found some errors in your code but it's okay, honey, mommy believes in you <3
 
-error[E0010]: oh sweetie, there aren't enough elements on the stack to add, could you try again for mommy?~
+error[E0011]: oh sweetie, there aren't enough elements on the stack to add, could you try again for mommy?~
   ╭─ bleh.uwu:1:7
   │
 1 │ haiii :3
@@ -60,6 +66,17 @@ error[E0010]: oh sweetie, there aren't enough elements on the stack to add, coul
 ```
 
 Now you can finally get some validation for all your hard work!
+
+## Examples
+
+Here is a simple "Hello, world!" program:
+
+```
+hawwo 🥺 asdelkjla;afsdlkfjaksldkfjd >//////< :3333 >//< mreow dksfhapsduiofalsdkfjalsdkasdj :3 >//< aa :3 mreow >//< asdfkjhsl :3 >////< meow mrrp waow :3 yip asdkljfhasdklufhasdfasdhjflkjahld >////< wlsdkjfhaioua :3 meow mrrp >w< >//< fsdklfakl :3 >//<mkasdpfoasik :3 yip >//< bleh :3 mreow >//< asdlkvj :3 meow mrrp mreow um :3 mrrp >.< hawwo 👉👈
+```
+
+As with any language based around printing ASCII via byte manipulation, there is no singular solution to a problem, so your "Hello, world!" could look very different to this one.
+Feel free to submit a pull request with more complex/useful examples!
 
 ## Customisation
 
@@ -70,7 +87,7 @@ There are several behaviours which can be customised through environment variabl
 - `DEFAULT_PRAISE_TERMS` - default = "girl/pet"
 - `DEFAULT_PRINT_KEYWORDS` - default = "meow/mreow/mrrp/woof/wruff/yip"
 
-All of these can be overriden when running the interpreter by simply passing them in on the commandline. Multiple potential values can be used by separating them with slashes (`/`) and then a random one is chosen from the pool each time.
+All of these can be overriden when running the interpreter by simply passing them in on the commandline. Multiple potential values can be used by separating them with slashes (`/`) and then a random one is chosen from the pool each time, with the exception of `DEFAULT_PRINT_KEYWORDS` where all options are always valid.
 
 ## Installation
 
