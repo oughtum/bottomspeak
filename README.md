@@ -74,7 +74,22 @@ Now you can finally get some validation for all your hard work!
 Here is a simple "Hello, world!" program:
 
 ```
-hawwo 🥺 asdelkjla;afsdlkfjaksldkfjd >//////< :3333 >//< mreow dksfhapsduiofalsdkfjalsdkasdj :3 >//< aa :3 mreow >//< asdfkjhsl :3 >////< meow mrrp waow :3 yip asdkljfhasdklufhasdfasdhjflkjahld >////< wlsdkjfhaioua :3 meow mrrp >w< >//< fsdklfakl :3 >//<mkasdpfoasik :3 yip >//< bleh :3 mreow >//< asdlkvj :3 meow mrrp mreow um :3 mrrp >.< hawwo 👉👈
+hawwo 🥺
+  asdelkjla;afsdlkfjaksldkfjd >//////<
+  :3333 >//< mreow
+  dksfhapsduiofalsdkfjalsdkasdj :3 >//<
+  aa :3 mreow >//<
+  asdfkjhsl :3 >////< meow mrrp
+  waow :3 yip
+  asdkljfhasdklufhasdfasdhjflkjahld >////<
+  wlsdkjfhaioua :3 meow mrrp >w< >//<
+  fsdklfakl :3 >//<
+  mkasdpfoasik :3 yip >//<
+  bleh :3 mreow >//<
+  asdlkvj :3 meow mrrp mreow
+  um :3 mrrp >.<
+
+hawwo 👉👈
 ```
 
 As with any language based around printing ASCII via byte manipulation, there is no singular solution to a problem, so your "Hello, world!" could look very different to this one.
