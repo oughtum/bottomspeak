@@ -5,7 +5,7 @@ Now you can program with the same kind of basic symbols you'd use when faced wit
 
 _BottomSpeak_ is a stack-based language and as such has a very simple instruction set based around manipulating said stack.
 
-## Stack Manipulation
+## Language Syntax
 
 ### Keysmashes
 
@@ -40,6 +40,10 @@ alsdkfkl 👉👈
 
 This will call the subroutine called `alsdkfkl` and begin doing as it's told like any good little sub should.
 
+### Comments
+
+Comments are always inline and can be formed using the trans flag emoji '🏳️‍⚧️'.
+
 ## Error Reporting
 
 BottomSpeak is a silly language but that doesn't mean it can't have good error reporting! The language shows you exactly where you went wrong and also gives some supportive words of encouragement, for example:
@@ -61,12 +65,16 @@ Now you can finally get some validation for all your hard work!
 
 There are several behaviours which can be customised through environment variables.
 
-- `DEFAULT_INTERP_TITLES` - default = "mommy"
+- `DEFAULT_INTERP_TITLES` - default = "mommy/owner"
 - `DEFAULT_PETNAMES` - default = "sweetheart/sweetie/cutie/darling/honey"
 - `DEFAULT_PRAISE_TERMS` - default = "girl/pet"
 - `DEFAULT_PRINT_KEYWORDS` - default = "meow/mreow/mrrp/woof/wruff/yip"
 
 All of these can be overriden when running the interpreter by simply passing them in on the commandline. Multiple potential values can be used by separating them with slashes (`/`) and then a random one is chosen from the pool each time.
+
+## Installation
+
+BottomSpeak is available through cargo, simply run `cargo install bottomspeak` and you're done :3
 
 ## Notes
 

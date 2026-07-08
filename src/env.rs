@@ -2,7 +2,7 @@ use std::env;
 
 use rand::{rngs::SmallRng, seq::IndexedRandom};
 
-pub(crate) const DEFAULT_INTERP_TITLES: [&str; 1] = ["mommy"];
+pub(crate) const DEFAULT_INTERP_TITLES: [&str; 2] = ["mommy", "owner"];
 pub(crate) const DEFAULT_PETNAMES: [&str; 5] =
     ["sweetheart", "sweetie", "cutie", "darling", "honey"];
 pub(crate) const DEFAULT_PRAISE_TERMS: [&str; 2] = ["girl", "pet"];
