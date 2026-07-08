@@ -42,6 +42,8 @@ alsdkfkl 👉👈
 
 This will call the subroutine called `alsdkfkl` and begin doing as it's told like any good little sub should.
 
+An important thing to note is that a subroutine call is actually a jump instruction, specifically jump-if-zero, which means the instruction will only execute if the stack is empty, or the top value is 0, which does allow for some branching in control flow.
+
 ### Comments
 
 Comments are always inline and can be formed using the trans flag emoji '🏳️‍⚧️':
