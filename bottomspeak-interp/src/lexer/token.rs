@@ -35,6 +35,8 @@ impl Token {
 pub(crate) enum TokenType {
     /// '`>w<`'
     BlushW,
+    /// `'>~<'`
+    BlushTilde,
     /// '`:3`'
     ColonThree {
         len: u8,

@@ -5,6 +5,7 @@
 🏳️‍⚧️   OP   |    SYNTAX    |                           DESCRIPTION                          
 🏳️‍⚧️ -------+--------------+-----------------------------------------------------------------------
 🏳️‍⚧️   PSH  |  <keysmash>  | pushes a value to the stack
+🏳️‍⚧️   POP  |     >~<      | pops a value from the stack
 🏳️‍⚧️   SWP  |     >w<      | swaps the last two items on the stack
 🏳️‍⚧️   ADD  |      :3      | pops and adds the last 2*N stack values (N = # of `3`)
 🏳️‍⚧️   PRN  |    mreow     | pops and prints the top stack value as an ASCII char
@@ -75,5 +76,3 @@ hawwo 🥺
   bleh :3 mreow >//<                       🏳️‍⚧️[32, 100, 108, 108] "o"
   asdlkvj :3 meow mrrp mreow               🏳️‍⚧️[32] "r" "l" "d"
   um :3 mrrp >.<                           🏳️‍⚧️[] "!"
-
-hawwo 👉👈

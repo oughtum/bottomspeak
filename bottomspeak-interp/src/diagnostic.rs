@@ -176,4 +176,14 @@ pub(crate) enum ErrorKind {
         petname: String,
         interp_title: String,
     },
+
+    #[msg(
+        "{name} couldn't find any subroutine called `{interp_title}`, but I know you can do better for me next time {petname} <3"
+    )]
+    #[code(0008)]
+    UnresolvedSubroutine {
+        name: String,
+        interp_title: String,
+        petname: String,
+    },
 }

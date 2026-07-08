@@ -169,8 +169,24 @@ impl<'lx> Lexer<'lx> {
         match self.peek() {
             Some('w') => {
                 self.next();
+
                 if self.matches('<') {
                     TokenType::BlushW
+                } else {
+                    self.ctx.report(diagnostic!(
+                        ErrorKind::UnfinishedEmoticon {
+                            petname: self.ctx.rand_petname().into(),
+                            char_to_add: '<'
+                        },
+                        labels = [(self.byte_range(), "")]
+                    ));
+                    TokenType::Error
+                }
+            }
+            Some('~') => {
+                self.next();
+                if self.matches('<') {
+                    TokenType::BlushTilde
                 } else {
                     self.ctx.report(diagnostic!(
                         ErrorKind::UnfinishedEmoticon {

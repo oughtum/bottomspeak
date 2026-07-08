@@ -9,7 +9,7 @@ use crate::{
     env::EnvVars,
     lexer::Lexer,
     source::SourceContext,
-    vm::{Op, OpCode, Vm},
+    vm::{Op, OpCode, Subroutine, Vm},
 };
 use std::{
     collections::BTreeMap,
@@ -29,13 +29,9 @@ pub fn run(source: &str, name: &str) -> crate::Result<()> {
         return Ok(());
     }
 
-    let bytecode = vec![
-        Op::new(OpCode::Push(2), 0..0),
-        Op::new(OpCode::Push(3), 0..0),
-        Op::new(OpCode::Add, 0..0),
-    ];
+    let submap = BTreeMap::new();
 
-    let mut vm = Vm::new(&mut ctx, bytecode);
+    let mut vm = Vm::new(&mut ctx, submap);
     vm.run()?;
 
     if ctx.err_occurred() {

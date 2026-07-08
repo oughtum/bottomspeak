@@ -2,7 +2,6 @@
 
 use indoc::indoc;
 use pretty_assertions::assert_eq;
-use std::error::Error;
 
 use super::*;
 
