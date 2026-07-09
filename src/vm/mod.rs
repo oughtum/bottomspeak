@@ -243,6 +243,7 @@ impl<'vm> Vm<'vm> {
                         } else {
                             self.ctx.report(diagnostic!(
                                 ErrorKind::InvalidCodepoint {
+                                    codepoint,
                                     petname: self.ctx.rand_petname().into(),
                                     interp_title: self.ctx.rand_interp_title().into(),
                                 },

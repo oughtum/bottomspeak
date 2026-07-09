@@ -143,6 +143,7 @@ impl<'lx> Lexer<'lx> {
                     } else {
                         self.ctx.report(diagnostic!(
                             ErrorKind::UnfinishedEmoticon {
+                                praise_term: self.ctx.rand_praise_term().into(),
                                 petname: self.ctx.rand_petname().into(),
                                 char_to_add: '👈'
                             },
@@ -194,6 +195,7 @@ impl<'lx> Lexer<'lx> {
                 } else {
                     self.ctx.report(diagnostic!(
                         ErrorKind::UnfinishedEmoticon {
+                            praise_term: self.ctx.rand_praise_term().into(),
                             petname: self.ctx.rand_petname().into(),
                             char_to_add: '<'
                         },
@@ -209,6 +211,7 @@ impl<'lx> Lexer<'lx> {
                 } else {
                     self.ctx.report(diagnostic!(
                         ErrorKind::UnfinishedEmoticon {
+                            praise_term: self.ctx.rand_praise_term().into(),
                             petname: self.ctx.rand_petname().into(),
                             char_to_add: '<'
                         },
@@ -229,6 +232,7 @@ impl<'lx> Lexer<'lx> {
                 } else {
                     self.ctx.report(diagnostic!(
                         ErrorKind::UnfinishedEmoticon {
+                            praise_term: self.ctx.rand_praise_term().into(),
                             petname: self.ctx.rand_petname().into(),
                             char_to_add: '<'
                         },
@@ -256,6 +260,7 @@ impl<'lx> Lexer<'lx> {
             if this.peek().is_some_and(|peek| peek != '/') {
                 this.ctx.report(diagnostic!(
                     ErrorKind::UnfinishedEmoticon {
+                        praise_term: this.ctx.rand_praise_term().into(),
                         petname: this.ctx.rand_petname().into(),
                         char_to_add: '/'
                     },
@@ -299,6 +304,7 @@ impl<'lx> Lexer<'lx> {
 
         self.ctx.report(diagnostic!(
             ErrorKind::UnfinishedEmoticon {
+                praise_term: self.ctx.rand_praise_term().into(),
                 petname: self.ctx.rand_petname().into(),
                 char_to_add: '<'
             },
@@ -330,6 +336,7 @@ impl<'lx> Lexer<'lx> {
         if len == 0 {
             self.ctx.report(diagnostic!(
                 ErrorKind::UnfinishedEmoticon {
+                    praise_term: self.ctx.rand_praise_term().into(),
                     petname: self.ctx.rand_petname().into(),
                     char_to_add: '3'
                 },

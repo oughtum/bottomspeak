@@ -44,12 +44,13 @@ pub fn run(source: &str, name: &str) -> crate::Result<()> {
     }
 
     println!(
-        "{}{}{}{}{}",
+        "{}{}{}{}{}\n{}",
         "Your code had no errors, ".magenta(),
         ctx.rand_interp_title().magenta(),
         " is so proud of you, ".magenta(),
         ctx.rand_petname().magenta(),
-        " <3\n".magenta(),
+        " <3".magenta(),
+        "Here's your output~\n".magenta()
     );
 
     println!("{}", output);

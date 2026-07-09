@@ -105,7 +105,7 @@ pub(crate) trait CompilerError {
 pub(crate) enum ErrorKind {
     // Bug
     #[msg(
-        "oh dear, {interp_title} made a mistake, why don't you be a good {praise_term} and go report it at `https://www.github.com/oughtum/bottomspeak-interp/issues/` for me~"
+        "oh dear, {interp_title} made a mistake, why don't you be a good {praise_term} and go report it at `https://www.github.com/oughtum/bottomspeak/issues/` for me~"
     )]
     #[code(0000)]
     Bug {
@@ -125,10 +125,14 @@ pub(crate) enum ErrorKind {
     },
 
     #[msg(
-        "you seem to have an unfinished emoticon here, could you please add a `{char_to_add}` at the end for me, {petname}~"
+        "I know speaking is hard for my good {praise_term} but could you please add a `{char_to_add}` at the end for me, {petname}~"
     )]
     #[code(0002)]
-    UnfinishedEmoticon { petname: String, char_to_add: char },
+    UnfinishedEmoticon {
+        praise_term: String,
+        petname: String,
+        char_to_add: char,
+    },
 
     #[msg(
         "{interp_title} doesn't quite understand, did you mean to type one of these, {petname}? - `>w<`, `>//<`, `>.<`"
@@ -206,10 +210,11 @@ pub(crate) enum ErrorKind {
     },
 
     #[msg(
-        "sorry {petname}, unicode characters are in the range 0x000000-0x10FFFF, git it another go for {interp_title} okay?~"
+        "sorry {petname}, you're trying to print 0x{codepoint:X} but unicode characters are in the range 0x000000-0x10FFFF, give it another go for {interp_title} okay?~"
     )]
     #[code(0012)]
     InvalidCodepoint {
+        codepoint: u32,
         petname: String,
         interp_title: String,
     },
@@ -225,7 +230,7 @@ pub(crate) enum ErrorKind {
     },
 
     #[msg(
-        "{interp_title} needs some help understanding your code, {petname}, be a good {praise_term} and add some comments~"
+        "{interp_title} needs some help understanding your code, {petname}, so be an obedient {praise_term} and add some comments~"
     )]
     #[code(0014)]
     UncommentedSource {
