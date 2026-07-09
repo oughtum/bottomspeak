@@ -58,7 +58,7 @@ Comments are always inline and can be formed using the trans flag emoji '🏳️
 BottomSpeak is a silly language but that doesn't mean it can't have good error reporting! The language shows you exactly where you went wrong and also gives some supportive words of encouragement, for example:
 
 ```
-Owner found some errors in your code but it's okay, sweetie, owner believes in you <3
+Mommy found some errors in your code but it's okay, sweetie, mommy believes in you <3
 
 error[E0002]: I know speaking is hard for my good girl but could you please add a `<` at the end for me, sweetheart~
   ╭─ bleh.uwu:1:13
@@ -77,7 +77,7 @@ Here is a simple "Hello, world!" program with comments tracking the state of the
 ```
 🏳️‍⚧️ prints "Hello, world!" to stdout
 hawwo 🥺                                   🏳️‍⚧️ []
-  asdelkjla;afsdlkfjaksldkfjd >//////<     🏳️‍⚧️ [8] -> [8, 16] -> [8, 16, 16, 16]
+  asdelkjla;afsdlkfjaksldkfjd >//////<     🏳️‍⚧️ [8] -> [8, 16] -> [8, 16, 16, 16, 16]
   :3333 >//< mreow                         🏳️‍⚧️ [72] -> [72, 72] -> [72] 'H'
   dksfhapsduiofalsdkfjalsdkasdj :3 >//<    🏳️‍⚧️ [72, 28] -> [100] -> [100, 100]
   aa :3 mreow >//<                         🏳️‍⚧️ [100, 100, 1] -> [100, 101] -> [100] 'e' -> [100, 100]
