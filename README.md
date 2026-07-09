@@ -101,12 +101,12 @@ Feel free to submit a pull request with more complex/useful examples!
 
 There are several behaviours which can be customised through environment variables.
 
-- `DEFAULT_INTERP_TITLES` - default = "mommy/owner"
-- `DEFAULT_PETNAMES` - default = "sweetheart/sweetie/cutie/darling/honey"
-- `DEFAULT_PRAISE_TERMS` - default = "girl/pet"
-- `DEFAULT_PRINT_KEYWORDS` - default = "meow/mreow/mrrp/woof/wruff/yip"
+- `BOTTOMSPEAK_INTERP_TITLES` - default = "mommy/owner"
+- `BOTTOMSPEAK_PETNAMES` - default = "sweetheart/sweetie/cutie/darling/honey"
+- `BOTTOMSPEAK_PRAISE_TERMS` - default = "girl/pet"
+- `BOTTOMSPEAK_PRINT_KEYWORDS` - default = "meow/mreow/mrrp/woof/wruff/yip"
 
-All of these can be overriden when running the interpreter by simply passing them in on the commandline. Multiple potential values can be used by separating them with slashes (`/`) and then a random one is chosen from the pool each time, with the exception of `DEFAULT_PRINT_KEYWORDS` where all options are always valid.
+All of these can be overriden when running the interpreter by simply passing them in on the commandline. Multiple potential values can be used by separating them with slashes (`/`) and then a random one is chosen from the pool each time, with the exception of `BOTTOMSPEAK_PRINT_KEYWORDS` where all options are always valid.
 
 ## REPL
 
