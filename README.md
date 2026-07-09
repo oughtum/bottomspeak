@@ -1,13 +1,12 @@
 # BottomSpeak
 
-BottomSpeak is the ultimate language for expressing yourself through programming. Expressions? Boring. Types? Who needs 'em?
-Now you can program with the same kind of basic symbols you'd use when faced with even the slightest amount of dominance!
+BottomSpeak is the ultimate language for expressing yourself through programming. Expressions? Boring. Types? Who needs 'em? Now you can program with the same kind of basic symbols you'd use when faced with even the slightest amount of dominance!
 
-BottomSpeak is a stack-based language and as such has a very simple instruction set based around manipulating said stack.
+BottomSpeak is a stack-based language and as such has a very simple instruction set based around manipulating said stack. BottomSpeak does not require a specific file extension, so feel free to use whatever you like, or none at all! All examples in the repo will use the `.uwu` extension, simply because why not?
+
+The language's design isn't complete and I do intend to add more things to aid with control flow, particularly conditional evaluation and loops; the end goal is Turing completeness. If you encounter any issues using the language, don't hesitate to [open an issue](https://github.com/oughtum/bottomspeak/issues/new) in the repo!
 
 ## Language Syntax
-
-BottomSpeak does not require a specific file extension, so feel free to use whatever you like, or none at all! All examples in the repo will use the `uwu` extension simply because why not?
 
 ### Keysmashes
 
@@ -15,7 +14,7 @@ These are how you push values to the stack. They can have a maximum length of 12
 
 For example, `asdfglaskdjh` has a length of 12 characters and thus is encoded as the value 11 in decimal because lowercase keysmashes start at 0, while `AKSDJHFPAOISDUJASDLKFJOI` has a length of 24 characters and thus is encoded as the value 151 because uppercase keysmashes start at 128.
 
-Ordinarily, keysmashes must be separated by whitespace or a different case, otherwise they get parsed as a single keysmash, but it's also possible to use semicolons (`;`) to delimit them as they are also a common keysmash character e.g. `asdlkj dfkgjhasdo` == `asdlkj;dfkgjhasdo` and `sdlkjBAKLSDJ` == `sdlkj BAKLSDJ` == `sdlkj;BAKLSDJ`.
+Ordinarily, keysmashes must be separated by whitespace or a different case, otherwise they get parsed as a single keysmash, but it's also possible to use semicolons (`;`) to delimit them as they are also a common keysmash character e.g. `asdlkj;dfkgjhasdo` is equivalent to `asdlkj dfkgjhasdo`, also `sdlkjBAKLSDJ` and `sdlkj;BAKLSDJ` are equivalent to `sdlkj BAKLSDJ`. In fact, it's possible to use semicolons to delimit any and all instructions as they are just treated the same as whitespace, but their intended use is for keysmashes.
 
 ### Instructions
 
@@ -36,15 +35,15 @@ Subroutines are a way to reuse code and as we all know, subs love getting used o
 alsdkfkl 🥺
 ```
 
-Subs must of course finish at some point, so to do that simply use `>.<` at the end of the declaration. Finally, in order to get a subroutine to actually run, you can call it with a similar syntax to declarations:
+Subs must of course finish at some point, so to do that simply use `>.<` at the end of the declaration.
+
+In order to get a subroutine to do anything, you can jump to its instruction block by specifying the identifier of the subroutine you wish to jump to and then `👉👈`, like so:
 
 ```
 alsdkfkl 👉👈
 ```
 
-This will call the subroutine called `alsdkfkl` and begin doing as it's told like any good little sub should.
-
-An important thing to note is that a subroutine call is actually a jump instruction, specifically jump-if-zero, which means the instruction will only execute if the stack is empty, or the top value is 0, which does allow for some branching in control flow.
+Something to note is that the `👉👈` instruction will jump to the specified subroutine only if the stack is empty or the top value is a zero byte, otherwise evaluation continues to the next instruction.
 
 ### Comments
 
@@ -59,13 +58,13 @@ Comments are always inline and can be formed using the trans flag emoji '🏳️
 BottomSpeak is a silly language but that doesn't mean it can't have good error reporting! The language shows you exactly where you went wrong and also gives some supportive words of encouragement, for example:
 
 ```
-Mommy found some errors in your code but it's okay, honey, mommy believes in you <3
+Owner found some errors in your code but it's okay, sweetie, owner believes in you <3
 
-error[E0011]: oh sweetie, there aren't enough elements on the stack to add, could you try again for mommy?~
-  ╭─ bleh.uwu:1:7
+error[E0002]: I know speaking is hard for my good girl but could you please add a `<` at the end for me, sweetheart~
+  ╭─ bleh.uwu:1:13
   │
-1 │ haiii :3
-  │       ^^
+1 │ haiiii bweh >w
+  │             ^^
 2 │
 ```
 
@@ -73,28 +72,31 @@ Now you can finally get some validation for all your hard work!
 
 ## Examples
 
-Here is a simple "Hello, world!" program:
+Here is a simple "Hello, world!" program with comments tracking the state of the stack and each time text is printed:
 
 ```
-hawwo 🥺
-  asdelkjla;afsdlkfjaksldkfjd >//////<
-  :3333 >//< mreow
-  dksfhapsduiofalsdkfjalsdkasdj :3 >//<
-  aa :3 mreow >//<
-  asdfkjhsl :3 >////< meow mrrp
-  waow :3 yip
-  asdkljfhasdklufhasdfasdhjflkjahld >////<
-  wlsdkjfhaioua :3 meow mrrp >w< >//<
-  fsdklfakl :3 >//<
-  mkasdpfoasik :3 yip >//<
-  bleh :3 mreow >//<
-  asdlkvj :3 meow mrrp mreow
-  um :3 mrrp >.<
+🏳️‍⚧️ prints "Hello, world!" to stdout
+hawwo 🥺                                   🏳️‍⚧️ []
+  asdelkjla;afsdlkfjaksldkfjd >//////<     🏳️‍⚧️ [8] -> [8, 16] -> [8, 16, 16, 16]
+  :3333 >//< mreow                         🏳️‍⚧️ [72] -> [72, 72] -> [72] 'H'
+  dksfhapsduiofalsdkfjalsdkasdj :3 >//<    🏳️‍⚧️ [72, 28] -> [100] -> [100, 100]
+  aa :3 mreow >//<                         🏳️‍⚧️ [100, 100, 1] -> [100, 101] -> [100] 'e' -> [100, 100]
+  asdfkjhsl :3 >////< meow mrrp            🏳️‍⚧️ [100, 100, 8] -> [100, 108] -> [100, 108, 108, 108] 'l' 'l' -> [100, 108]
+  waow :3 yip                              🏳️‍⚧️ [100, 108, 3] -> [100, 111] 'o' -> [100]
+  asdkljfhasdklufhasdfasdhjflkjahld >////< 🏳️‍⚧️ [100, 32] -> [100, 32, 32, 32]
+  wlsdkjfhaioua :3 meow mrrp >w< >//<      🏳️‍⚧️ [100, 32, 32, 32, 12] -> [100, 32, 32, 44] -> [100, 32] ',' ' ' -> [32, 100] -> [32, 100, 100]
+  fsdklfakl :3 >//<                        🏳️‍⚧️ [32, 100, 100, 8] -> [32, 100, 108] -> [32, 100, 108, 108]
+  mkasdpfoasik :3 yip >//<                 🏳️‍⚧️ [32, 100, 108, 108, 11] -> [32, 100, 108, 119] 'W' -> [32, 100, 108] -> [32, 100, 108, 108]
+  bleh :3 mreow >//<                       🏳️‍⚧️ [32, 100, 108, 108, 3] -> [32, 100, 108, 111] -> [32, 100, 108] 'o' -> [32, 100, 108, 108]
+  asdlkvj :3 meow mrrp mreow               🏳️‍⚧️ [32, 100, 108, 108, 6] -> [32, 100, 108, 114] -> [32] 'r' 'l' 'd'
+  um :3 mrrp >.<                           🏳️‍⚧️ [32, 1] -> [33] '!' -> []
 
 hawwo 👉👈
 ```
 
-As with any language based around printing ASCII via byte manipulation, there is no singular solution to a problem, so your "Hello, world!" could look very different to this one.
+As with any language, there is no singular solution to a problem, so your "Hello, world!" could look very different to this one.
+
+You can find the above example within the `examples/` directory and currently it is the only one as the language is still very new and not easy (or maybe impossible) to use for real computation.
 Feel free to submit a pull request with more complex/useful examples!
 
 ## Customisation
@@ -110,12 +112,12 @@ All of these can be overriden when running the interpreter by simply passing the
 
 ## REPL
 
-BottomSpeak also features an interactive REPL so you can play around with the language with ease.
-It includes a few basic commands which should be enough for simple programs.
+BottomSpeak also features an interactive REPL so you can play around with the language with ease. It includes a few basic commands for interacting with the REPL and should be such sufficient for simpler programs.
 
 ## Installation
 
-BottomSpeak is available through cargo, simply run `cargo install bottomspeak` and you're done :3
+BottomSpeak is available through `cargo`, which you can get by installing `rustup` from the [official site](https://rustup.rs/) or your package manager of choice.
+Simply run `cargo install bottomspeak` and you're done :3
 
 ## Notes
 
