@@ -220,7 +220,7 @@ pub(crate) enum ErrorKind {
     },
 
     #[msg(
-        "{name} couldn't find any subroutine called `{interp_title}`, but I know you can do better for me next time {petname} <3"
+        "{interp_title} couldn't find any subroutine called `{name}`, but I know you can do better for me next time {petname} <3"
     )]
     #[code(0013)]
     UnresolvedSubroutine {

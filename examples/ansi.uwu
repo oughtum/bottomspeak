@@ -1,0 +1,67 @@
+🏳️‍⚧️ prints a 16x16 grid of characters to showcase ANSI colours
+
+🏳️‍⚧️ pushes a space to the stack
+space 🥺
+  asdkfjlsk >//////< :333
+>.<
+
+🏳️‍⚧️ pushes a space to the stack
+printnewline 🥺
+  asdkljfhasd mrrp
+>.<
+
+
+🏳️‍⚧️ pushes the grid size - 1 to the stack for comparisons
+gridsize 🥺
+  alsdkjfhalsdkjjk
+>.<
+
+🏳️‍⚧️ iterate over each row and print coloured text
+yaxis 🥺
+  🏳️‍⚧️ init x as 0 each iteration
+  e
+  xaxis 👉👈
+  printnewline 👉👈
+  O~O O~O
+  🏳️‍⚧️ if y == gridsize, return
+  gridsize 👉👈
+  ^x^ >.<
+  🏳️‍⚧️ otherwise increment y and recurse
+  >x< O~O
+  wa :3
+  yaxis 👉👈
+>.<
+
+🏳️‍⚧️ iterate over each column and print coloured text
+xaxis 🥺
+  🏳️‍⚧️print two cells for a more square look
+  printcolourcell 👉👈
+  printcolourcell 👉👈
+
+  🏳️‍⚧️ if x == gridsize, return
+  gridsize 👉👈
+  ^x^ >.<
+  🏳️‍⚧️ otherwise increment x and recurse
+  >x< O~O
+  wa :3
+  xaxis 👉👈
+>.<
+
+printcolourcell 🥺
+  🏳️‍⚧️ push ANSI bg colour (y * 16 + x)
+  >\\< @~@ >//////< :333 >//////< :3333
+  🏳️‍⚧️ push space and swap with bg
+  space 👉👈 @~@
+  🏳️‍⚧️ push ANSI fg colour (0) and swap with bg
+  e @~@
+  🏳️‍⚧️ push modifiers (0)
+  e
+  🏳️‍⚧️ print coloured text
+  🏳️‍🌈
+>.<
+
+🏳️‍⚧️ init y as 0
+e
+
+🏳️‍⚧️ iterate over both axes of the grid for ANSI colours
+yaxis 👉👈

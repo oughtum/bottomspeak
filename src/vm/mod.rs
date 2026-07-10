@@ -427,7 +427,7 @@ impl<'vm> Vm<'vm> {
                         let current = *self.stack.last().unwrap();
 
                         if *double {
-                            let prev = *self.stack.get(self.stack.len().saturating_sub(1)).unwrap();
+                            let prev = *self.stack.get(self.stack.len().saturating_sub(2)).unwrap();
 
                             self.stack.push(prev);
                         }

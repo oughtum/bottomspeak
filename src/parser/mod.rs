@@ -135,12 +135,48 @@ impl<'p> Parser<'p> {
             let range = tok.range();
 
             match tok.kind() {
-                TokenType::HappyX => self.emit_op(Op::new(OpCode::Eq, range)),
-                TokenType::HappyO => self.emit_op(Op::new(OpCode::Greater, range)),
-                TokenType::HappyW => self.emit_op(Op::new(OpCode::Less, range)),
-                TokenType::FlusteredX => self.emit_op(Op::new(OpCode::Neq, range)),
-                TokenType::FlusteredO => self.emit_op(Op::new(OpCode::GreaterEq, range)),
-                TokenType::FlusteredW => self.emit_op(Op::new(OpCode::LessEq, range)),
+                TokenType::HappyX => {
+                    self.emit_op(Op::new(OpCode::Eq, range));
+
+                    if self.matches(TokenType::FlusteredDot) {
+                        self.emit_op(Op::new(OpCode::Return, self.peekp()?.range()));
+                    }
+                }
+                TokenType::HappyO => {
+                    self.emit_op(Op::new(OpCode::Greater, range));
+
+                    if self.matches(TokenType::FlusteredDot) {
+                        self.emit_op(Op::new(OpCode::Return, self.peekp()?.range()));
+                    }
+                }
+                TokenType::HappyW => {
+                    self.emit_op(Op::new(OpCode::Less, range));
+
+                    if self.matches(TokenType::FlusteredDot) {
+                        self.emit_op(Op::new(OpCode::Return, self.peekp()?.range()));
+                    }
+                }
+                TokenType::FlusteredX => {
+                    self.emit_op(Op::new(OpCode::Neq, range));
+
+                    if self.matches(TokenType::FlusteredDot) {
+                        self.emit_op(Op::new(OpCode::Return, self.peekp()?.range()));
+                    }
+                }
+                TokenType::FlusteredO => {
+                    self.emit_op(Op::new(OpCode::GreaterEq, range));
+
+                    if self.matches(TokenType::FlusteredDot) {
+                        self.emit_op(Op::new(OpCode::Return, self.peekp()?.range()));
+                    }
+                }
+                TokenType::FlusteredW => {
+                    self.emit_op(Op::new(OpCode::LessEq, range));
+
+                    if self.matches(TokenType::FlusteredDot) {
+                        self.emit_op(Op::new(OpCode::Return, self.peekp()?.range()));
+                    }
+                }
                 TokenType::FlusteredTilde => self.emit_op(Op::new(OpCode::Input, range)),
                 TokenType::HeavyFlusteredAt => self.emit_op(Op::new(OpCode::Swap, range)),
                 TokenType::HeavyFlusteredO => self.emit_op(Op::new(OpCode::Pop, range)),
