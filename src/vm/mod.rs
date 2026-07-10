@@ -4,11 +4,64 @@ use std::{
     range::Range,
 };
 
+use crossterm::style::{Attribute, Color::AnsiValue, Stylize};
+
 use crate::{diagnostic, diagnostics::ErrorKind, source::SourceContext};
 
 pub(crate) mod tests;
 
 pub(crate) const INTERNAL_ROOT_SUBROUTINE: &str = "__root";
+const ANSI_ATTRIBUTES: [Attribute; 8] = [
+    // 1
+    Attribute::Bold,
+    // 2
+    Attribute::Dim,
+    // 4
+    Attribute::Italic,
+    // 8
+    Attribute::Underlined,
+    // 16
+    Attribute::SlowBlink,
+    // 32
+    Attribute::Reverse,
+    // 64
+    Attribute::Hidden,
+    // 128
+    Attribute::CrossedOut,
+];
+
+/// Evaluates a comparison operator.
+///
+/// # Examples
+///
+/// ```
+/// cmp_op!(self, >=, 0..5);
+/// ```
+macro_rules! cmp_op {
+    ($self:ident, $op:tt, $range:expr) => {{
+        let current = $self.stack.last();
+        let prev = $self.stack.get($self.stack.len().saturating_sub(2));
+
+        if let Some(current) = current
+            && let Some(prev) = prev
+        {
+            if !(prev $op current)
+                && let Some(frame) = $self.last_frame_mut()
+            {
+                *frame.ins_ptr += 2;
+            }
+        } else {
+            $self.ctx.report(diagnostic!(
+                ErrorKind::InsufficientElements {
+                    op: "compare".into(),
+                    petname: $self.ctx.rand_petname().into(),
+                    interp_title: $self.ctx.rand_interp_title().into()
+                },
+                labels = [($range, "")]
+            ))
+        }
+    }};
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Register(pub(crate) usize);
@@ -29,13 +82,23 @@ impl DerefMut for Register {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum OpCode {
+    Eq,
+    Greater,
+    Less,
+    Neq,
+    GreaterEq,
+    LessEq,
     Push(u8),
     Pop,
     Swap,
     Add,
+    Sub,
+    Input,
     Print,
     PrintUtf,
-    Duplicate,
+    PrintAnsi,
+    PrintStack(bool),
+    Duplicate(bool),
     Jump(String),
     Return,
 }
@@ -90,12 +153,16 @@ pub(crate) type SubroutineMap = BTreeMap<String, Subroutine>;
 pub(crate) struct Vm<'vm> {
     /// A mutable reference to the full context of the source.
     ctx: &'vm mut SourceContext,
+
     /// The evaluated values pushed to the user-facing stack.
     stack: Vec<u8>,
+
     /// A map of strings to the initial registers of subroutine declarations.
     submap: SubroutineMap,
+
     /// An array of call frames which keeps track of a subroutine's evaluation.
     frames: Vec<CallFrame>,
+
     /// The string to print once execution has finished.
     /// Pushing chars to this string is preferred over printing every char each time to avoid
     /// I/O overhead.
@@ -166,7 +233,16 @@ impl<'vm> Vm<'vm> {
 
             let range = op.range;
 
+            #[cfg(debug_assertions)]
+            let code = op.code.clone();
+
             match &op.code {
+                OpCode::Eq => cmp_op!(self, ==, range),
+                OpCode::Greater => cmp_op!(self, >, range),
+                OpCode::Less => cmp_op!(self, <, range),
+                OpCode::Neq => cmp_op!(self, !=, range),
+                OpCode::GreaterEq => cmp_op!(self, >=, range),
+                OpCode::LessEq => cmp_op!(self, <=, range),
                 OpCode::Push(val) => self.stack.push(*val),
                 OpCode::Pop => {
                     self.stack.pop();
@@ -198,13 +274,48 @@ impl<'vm> Vm<'vm> {
                     if let Some(current) = current
                         && let Some(prev) = prev
                     {
-                        self.stack.push(current.wrapping_add(prev));
+                        self.stack.push(prev + current);
                     } else {
                         self.ctx.report(diagnostic!(
                             ErrorKind::InsufficientElements {
                                 op: "add".into(),
                                 petname: self.ctx.rand_petname().into(),
+                                interp_title: self.ctx.rand_interp_title().into()
+                            },
+                            labels = [(range, "")]
+                        ))
+                    }
+                }
+                OpCode::Sub => {
+                    let current = self.stack.pop();
+                    let prev = self.stack.pop();
+
+                    if let Some(current) = current
+                        && let Some(prev) = prev
+                    {
+                        self.stack.push(prev.wrapping_sub(current));
+                    } else {
+                        self.ctx.report(diagnostic!(
+                            ErrorKind::InsufficientElements {
+                                op: "sub".into(),
+                                petname: self.ctx.rand_petname().into(),
                                 interp_title: self.ctx.rand_interp_title().into(),
+                            },
+                            labels = [(range, "")]
+                        ));
+                    }
+                }
+                OpCode::Input => {
+                    let byte = self.ctx.input.pop();
+
+                    if let Some(byte) = byte {
+                        self.stack.push(byte);
+                    } else {
+                        self.ctx.report(diagnostic!(
+                            ErrorKind::NoInput {
+                                interp_title: self.ctx.rand_interp_title().into(),
+                                petname: self.ctx.rand_petname().into(),
+                                praise_term: self.ctx.rand_praise_term().into()
                             },
                             labels = [(range, "")]
                         ));
@@ -261,12 +372,49 @@ impl<'vm> Vm<'vm> {
                         ));
                     }
                 }
-                OpCode::Duplicate => {
-                    let current = self.stack.last();
+                OpCode::PrintAnsi => {
+                    let modifier = self.stack.pop();
+                    let bg = self.stack.pop();
+                    let fg = self.stack.pop();
+                    let char = self.stack.pop();
 
-                    if let Some(current) = current {
-                        self.stack.push(*current);
+                    if let Some(modifier) = modifier
+                        && let Some(bg) = bg
+                        && let Some(fg) = fg
+                        && let Some(char) = char
+                    {
+                        let mut char = (char as char).with(AnsiValue(fg)).on(AnsiValue(bg));
+
+                        for i in 0..8 {
+                            let mask = 1 << i;
+                            let is_set = (modifier & mask) > 0;
+
+                            if is_set {
+                                char = char.attribute(ANSI_ATTRIBUTES[i]);
+                            }
+                        }
+
+                        self.printed_output.push_str(&char.to_string());
                     } else {
+                        self.ctx.report(diagnostic!(
+                            ErrorKind::InsufficientElements {
+                                op: "print with colour".into(),
+                                petname: self.ctx.rand_petname().into(),
+                                interp_title: self.ctx.rand_interp_title().into(),
+                            },
+                            labels = [(range, "")]
+                        ));
+                    }
+                }
+                OpCode::PrintStack(pretty) => {
+                    if *pretty {
+                        println!("{:#?}", self.stack);
+                    } else {
+                        println!("{:?}", self.stack);
+                    }
+                }
+                OpCode::Duplicate(double) => {
+                    if *double && self.stack.len() <= 1 || !double && self.stack.is_empty() {
                         self.ctx.report(diagnostic!(
                             ErrorKind::InsufficientElements {
                                 op: "duplicate".into(),
@@ -275,15 +423,21 @@ impl<'vm> Vm<'vm> {
                             },
                             labels = [(op.range, "")]
                         ));
+                    } else {
+                        let current = *self.stack.last().unwrap();
+
+                        if *double {
+                            let prev = *self.stack.get(self.stack.len().saturating_sub(1)).unwrap();
+
+                            self.stack.push(prev);
+                        }
+
+                        self.stack.push(current);
                     }
                 }
                 OpCode::Jump(ident) => {
-                    let current = self.stack.last();
-
-                    if current.is_some_and(|current| *current == 0) || current.is_none() {
-                        self.create_frame(ident.clone());
-                        continue;
-                    }
+                    self.create_frame(ident.clone());
+                    continue;
                 }
                 OpCode::Return => {
                     self.frames.pop();
@@ -293,7 +447,7 @@ impl<'vm> Vm<'vm> {
             #[cfg(debug_assertions)]
             println!(
                 "{}..{}\t| {:?}\t| {:?}",
-                range.start, range.end, op.code, self.stack
+                range.start, range.end, code, self.stack
             );
 
             if let Some(frame) = self.last_frame_mut() {

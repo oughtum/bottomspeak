@@ -5,7 +5,10 @@ use crate::{
     diagnostics::ErrorKind,
     lexer::{
         KEYSMASH_MAX_LEN,
-        token::{Token, TokenStream, TokenType},
+        token::{
+            Token, TokenStream,
+            TokenType::{self},
+        },
     },
     source::SourceContext,
     vm::{INTERNAL_ROOT_SUBROUTINE, Op, OpCode, Subroutine, SubroutineMap},
@@ -132,25 +135,34 @@ impl<'p> Parser<'p> {
             let range = tok.range();
 
             match tok.kind() {
-                TokenType::FlusteredW => self.emit_op(Op::new(OpCode::Swap, range)),
-                TokenType::FlusteredTilde => self.emit_op(Op::new(OpCode::Pop, range)),
-                TokenType::ColonThree { len } => {
+                TokenType::HappyX => self.emit_op(Op::new(OpCode::Eq, range)),
+                TokenType::HappyO => self.emit_op(Op::new(OpCode::Greater, range)),
+                TokenType::HappyW => self.emit_op(Op::new(OpCode::Less, range)),
+                TokenType::FlusteredX => self.emit_op(Op::new(OpCode::Neq, range)),
+                TokenType::FlusteredO => self.emit_op(Op::new(OpCode::GreaterEq, range)),
+                TokenType::FlusteredW => self.emit_op(Op::new(OpCode::LessEq, range)),
+                TokenType::FlusteredTilde => self.emit_op(Op::new(OpCode::Input, range)),
+                TokenType::HeavyFlusteredAt => self.emit_op(Op::new(OpCode::Swap, range)),
+                TokenType::HeavyFlusteredO => self.emit_op(Op::new(OpCode::Pop, range)),
+                TokenType::InterpTitle { pretty } => {
+                    self.emit_op(Op::new(OpCode::PrintStack(pretty), range))
+                }
+                TokenType::ColonThree { add, len } => {
                     let range = tok.range();
 
                     for _ in 0..len {
-                        self.emit_op(Op::new(OpCode::Add, range));
+                        let code = if add { OpCode::Add } else { OpCode::Sub };
+                        self.emit_op(Op::new(code, range));
                     }
                 }
-                TokenType::Blush { len } => {
+                TokenType::Blush { double, len } => {
                     let range = tok.range();
 
                     for _ in 0..len {
-                        self.emit_op(Op::new(OpCode::Duplicate, range));
+                        self.emit_op(Op::new(OpCode::Duplicate(double), range));
                     }
                 }
-                TokenType::FlusteredDot => {
-                    self.emit_op(Op::new(OpCode::Return, range));
-                }
+                TokenType::FlusteredDot => self.emit_op(Op::new(OpCode::Return, range)),
                 TokenType::Sub => {
                     let range = tok.range();
 
@@ -214,6 +226,7 @@ impl<'p> Parser<'p> {
                         self.emit_op(Op::new(OpCode::Print, range))
                     }
                 }
+                TokenType::PrintAnsi => self.emit_op(Op::new(OpCode::PrintAnsi, range)),
                 TokenType::Error | TokenType::Eof => {
                     self.next();
                     return None;

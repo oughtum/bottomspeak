@@ -6,7 +6,7 @@ use pretty_assertions::assert_eq;
 use super::*;
 
 fn lex(source: &str) -> crate::Result<TokenStream> {
-    let mut ctx = SourceContext::new(source, "<test>")?;
+    let mut ctx = SourceContext::new(source, Vec::new(), "<test>")?;
 
     let mut lexer = Lexer::new(&mut ctx);
     lexer.lex_tokens(true);
@@ -60,10 +60,17 @@ fn test_lexing() -> crate::Result<()> {
                 "lkad",
                 39..43
             ),
-            Token::new(TokenType::ColonThree { len: 3 }, ":333", 44..48),
-            Token::new(TokenType::Blush { len: 2 }, ">////<", 49..55),
+            Token::new(TokenType::ColonThree { add: true, len: 3 }, ":333", 44..48),
+            Token::new(
+                TokenType::Blush {
+                    double: false,
+                    len: 2
+                },
+                ">////<",
+                49..55
+            ),
             Token::new(TokenType::FlusteredW, ">w<", 56..59),
-            Token::new(TokenType::ColonThree { len: 3 }, ":333", 94..98),
+            Token::new(TokenType::ColonThree { add: true, len: 3 }, ":333", 94..98),
             Token::new(TokenType::Print { utf: false }, "mreow", 99..104),
             Token::new(
                 TokenType::Keysmash {
@@ -73,8 +80,15 @@ fn test_lexing() -> crate::Result<()> {
                 "adlkadlfdla",
                 133..144
             ),
-            Token::new(TokenType::Blush { len: 1 }, ">//<", 145..149),
-            Token::new(TokenType::ColonThree { len: 2 }, ":33", 150..153),
+            Token::new(
+                TokenType::Blush {
+                    double: false,
+                    len: 1
+                },
+                ">//<",
+                145..149
+            ),
+            Token::new(TokenType::ColonThree { add: true, len: 2 }, ":33", 150..153),
             Token::new(TokenType::Print { utf: false }, "mrrp", 154..158),
             Token::new(TokenType::FlusteredDot, ">.<", 188..191),
             Token::new(TokenType::Eof, "\0", 192..192),

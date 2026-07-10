@@ -58,16 +58,32 @@ impl Token {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) enum TokenType {
+    /// '`^x^`'
+    HappyX,
+    /// '`^o^`'
+    HappyO,
+    /// '`^w^`'
+    HappyW,
+    /// '`>x<`'
+    FlusteredX,
+    /// '`>o<`'
+    FlusteredO,
     /// '`>w<`'
     FlusteredW,
-    /// `'>~<'`
+    /// '`>~<`'
     FlusteredTilde,
+    /// '`@~@`'
+    HeavyFlusteredAt,
+    /// '`O~O`'
+    HeavyFlusteredO,
     /// '`:3`'
     ColonThree {
+        add: bool,
         len: u8,
     },
-    /// '`>//<`'
+    /// '`>//<`' or '`>\\<`'
     Blush {
+        double: bool,
         len: u8,
     },
     /// '`>.<`'
@@ -81,8 +97,15 @@ pub(crate) enum TokenType {
         lowercase: bool,
         len: u8,
     },
+    /// `'meow'`
     Print {
         utf: bool,
+    },
+    /// `'meow~'`
+    PrintAnsi,
+    /// '`mommy`'
+    InterpTitle {
+        pretty: bool,
     },
     Error,
     /// '`\0`'

@@ -238,4 +238,14 @@ pub(crate) enum ErrorKind {
         petname: String,
         praise_term: String,
     },
+
+    #[msg(
+        "{interp_title} has no input to use, {petname}, so be a good {praise_term} and provide some~"
+    )]
+    #[code(0015)]
+    NoInput {
+        interp_title: String,
+        petname: String,
+        praise_term: String,
+    },
 }

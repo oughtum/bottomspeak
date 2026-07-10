@@ -1,0 +1,14 @@
+🏳️‍⚧️ prints every ascii value from 0-255 with its corresponding ANSI colour
+
+a;wa >:3                       🏳️‍⚧️ push 0, sub 1 to overflow to 255 for equality check later
+alskdjfhl >//////< :333 wa >:3 🏳️‍⚧️ start counter at 31 (ASCII values before 32 are mainly control codes, so we don't include them)
+
+ascii 👉👈
+
+ascii 🥺
+  wa :3          🏳️‍⚧️ add 1 to counter
+  >////< w;a 🏳️‍🌈🏳️‍⚧️ print text with its corresponding ANSI colour as foreground
+  >x< ascii 👉👈 🏳️‍⚧️ if counter != 255, recurse
+  >.<            🏳️‍⚧️ return
+
+O~O O~O          🏳️‍⚧️ drop the counter and equality check values to clean up the stack

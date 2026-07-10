@@ -24,6 +24,9 @@ pub enum Command {
     Run {
         #[arg()]
         file: PathBuf,
+
+        #[arg(short, long)]
+        input: Vec<u8>,
     },
     /// Launch an interactive REPL
     Repl,
@@ -33,10 +36,10 @@ fn main() -> crate::Result<()> {
     let args = Cli::parse();
 
     match args.command {
-        Command::Run { file } => {
+        Command::Run { file, input } => {
             let source = fs::read_to_string(&file)?;
             let name = file.to_str().unwrap_or("<source>");
-            interpreter::run(&source, name)?
+            interpreter::run(&source, input, name)?
         }
         Command::Repl => interpreter::repl()?,
     }

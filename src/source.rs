@@ -12,19 +12,35 @@ use owo_colors::OwoColorize;
 use crate::{diagnostics::Diagnostic, env::EnvVars};
 
 pub(crate) struct SourceContext {
+    /// The actual source code.
     pub(crate) source: String,
-    pub(crate) name: String,
-    pub(crate) diagnostics: Vec<Diagnostic>,
+
+    pub(crate) input: Vec<u8>,
+
+    /// The name of the source used for diagnostic rendering. For source
+    /// files, this will be the path to the file and for the REPL it is '\<repl\>'.
+    name: String,
+
+    /// A collection of [`Diagnostic`]s reported during interpretation of this module.
+    diagnostics: Vec<Diagnostic>,
+
+    /// The indices of the start of each line within the source code.
+    /// Used by [`codespan_reporting`] for [`Diagnostic`] rendering.
+    ///
+    /// [`Diagnostic`]: codespan_reporting::diagnostic::Diagnostic
     pub(crate) line_starts: Vec<usize>,
+
+    /// Environment variables that dictate certain keywords customisable by the user.
     pub(crate) env_vars: EnvVars,
 }
 
 impl SourceContext {
-    pub(crate) fn new(source: &str, name: &str) -> crate::Result<Self> {
+    pub(crate) fn new(source: &str, input: Vec<u8>, name: &str) -> crate::Result<Self> {
         let line_starts = line_starts(source).collect();
 
         Ok(Self {
             source: source.into(),
+            input,
             name: name.into(),
             diagnostics: Vec::new(),
             line_starts,
@@ -102,7 +118,7 @@ impl SourceContext {
         let name = format!("{}{}", name.remove(0).to_uppercase(), name);
 
         println!(
-            "{}{}{}{}{}{}",
+            "\n{}{}{}{}{}{}",
             name.magenta(),
             " found some errors in your code but it's okay, ".magenta(),
             self.rand_petname().magenta(),

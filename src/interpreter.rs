@@ -13,8 +13,8 @@ use std::{
     sync::LazyLock,
 };
 
-pub fn run(source: &str, name: &str) -> crate::Result<()> {
-    let mut ctx = SourceContext::new(source, name)?;
+pub fn run(source: &str, input: Vec<u8>, name: &str) -> crate::Result<()> {
+    let mut ctx = SourceContext::new(source, input, name)?;
 
     let mut lexer = Lexer::new(&mut ctx);
     lexer.lex_tokens(name == "<repl>");
@@ -44,7 +44,7 @@ pub fn run(source: &str, name: &str) -> crate::Result<()> {
     }
 
     println!(
-        "{}{}{}{}{}\n{}",
+        "\n{}{}{}{}{}\n{}",
         "Your code had no errors, ".magenta(),
         ctx.rand_interp_title().magenta(),
         " is so proud of you, ".magenta(),
@@ -155,7 +155,7 @@ fn handle_repl_cmd(cmd: ReplCmd, state: &mut ReplState) -> crate::Result<()> {
             }
         }
         ReplCmd::Run => {
-            run(&state.src, "<repl>")?;
+            run(&state.src, Vec::new(), "<repl>")?;
             state.src = String::new();
         }
         ReplCmd::Clear => {

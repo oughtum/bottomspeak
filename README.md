@@ -1,10 +1,12 @@
 # BottomSpeak
 
+![gender? I hardly know 'er](https://pride-badges.pony.workers.dev/static/v1?label=gender%3F+i+hardly+know+%27er&labelColor=%23555&stripeWidth=8&stripeColors=FCF434%2CFFFFFF%2C9C59D1%2C2C2C2C) ![trans rights :3](https://pride-badges.pony.workers.dev/static/v1?label=trans+rights+%3A3&labelColor=%23555&stripeWidth=8&stripeColors=5BCEFA%2CF5A9B8%2CFFFFFF%2CF5A9B8%2C5BCEFA) ![women and enbies pretty](https://pride-badges.pony.workers.dev/static/v1?label=women+and+enbies+pretty&labelColor=%23555&stripeWidth=8&stripeColors=D52D00%2CEF7627%2CFF9A56%2CFFFFFF%2CD162A4%2CB55690%2CA30262)
+
 BottomSpeak is the ultimate language for expressing yourself through programming. Expressions? Boring. Types? Who needs 'em? Now you can program with the same kind of basic symbols you'd use when faced with even the slightest amount of dominance!
 
-BottomSpeak is a stack-based language and as such has a very simple instruction set based around manipulating said stack. BottomSpeak does not require a specific file extension, so feel free to use whatever you like, or none at all! All examples in the repo will use the `.uwu` extension, simply because why not?
+BottomSpeak is a stack-based language and as such has a fairly simple instruction set based around manipulating said stack. BottomSpeak does not require a specific file extension, so feel free to use whatever you like, or none at all! All examples in the repo will use the `.uwu` extension, simply because why not?
 
-The language's design isn't complete and I do intend to add more things to aid with control flow, particularly conditional evaluation and loops; the end goal is Turing completeness. If you encounter any issues using the language, don't hesitate to [open an issue](https://github.com/oughtum/bottomspeak/issues/new) in the repo!
+If you encounter any problems using the language, don't hesitate to [open an issue](https://github.com/oughtum/bottomspeak/issues/new) in the repo!
 
 ## Language Syntax
 
@@ -18,14 +20,54 @@ Ordinarily, keysmashes must be separated by whitespace or a different case, othe
 
 ### Instructions
 
-BottomSpeak features several instructions for simple stack manipulation:
+#### Arithmetic
 
-- `>~<` - Pops the top value from the stack and discards it.
-- `>w<` - Swaps the last two items on the stack.
-- `:3` - Pops the last two values on the stack, adds them together and pushes the result back to the stack. Subtraction can also be achieved using overflow behaviour. Multiple values can be added together at once by simply repeating the `3` e.g. `:333` would add the top two stack values three times.
+- `:3` - Pops the last two values on the stack, adds them together and pushes the result back to the stack. Multiple values can be added together at once by simply repeating the `3` e.g. a stack with values `[1, 5, 8, 2, 9]` followed by the instruction `:333` would result in the stack `[1, 24]`.
+- `>:3` - Identical to `:3` except used for subtraction.
+
+Both instructions allow overflow behaviour i.e. 0 - 1 == 255 and 255 + 1 == 0.
+
+#### Conditional Evaluation
+
+These instructions look at the top two stack values [`a`, `b`], then check a boolean predicate and skip the next instruction if the result is falsey. These are the predicates checked for each instruction:
+
+- `^x^` - `a == b`
+- `^o^` - `a > b`
+- `^w^` - `a < b`
+- `>x<` - `a != b`
+- `>o<` - `a >= b`
+- `>w<` - `a <= b`
+
+#### Moving Stack Values Around
+
 - `>//<` - Duplicates the value at the top of the stack. The value can be duplicated multiple times just like with `:3` by repeating the `//` e.g. `>//////<` would duplicate the value three times.
-- `meow` - One of several [default keywords](#customisation) used for popping the top stack value and printing it as an ASCII character to stdout.
+- `>\\<` - Identical to `>//<` except duplicates the top two stack values i.e. the stack `[1, 2]` would become `[1, 2, 1, 2]`.
+- `O~O` - Pops the top value from the stack and discards it.
+- `@~@` - Swaps the top two stack values.
+
+#### I/O
+
+- `>~<` - Takes in a single byte of input from the commandline via the `-i/--input` flag. Multiple byte values can be provided at once but each use of this instruction will only pop the last input value at a time.
+- `meow` - One of several [default keywords](#customisation) used for popping the top stack value and printing it as an ASCII character to stdout. Any keywords defined via the `BOTTOMSPEAK_PRINT_KEYWORDS` environment variable are valid as a print instruction.
 - `meow~` - Similar functionality to regular printing, but instead pops the last three stack values, pads them with an extra zero byte & constructs a unicode codepoint to be printed. For example, a stack with values `[1, 249, 122]` would be `[0x01, 0xf9, 0x7a]` in hexadecimal (or `[0x00, 0x01, 0xf9, 0x7a]` with padding), and thus is converted to the unicode codepoint `u1f97a` (🥺).
+- `mommy` - Another [default keyword](#customisation) normally used internally by the interpreter when reporting errors but also allows users of the language to debug the stack by printing it to stdout. Any keywords defined via the `BOTTOMSPEAK_INTERP_TITLE` environment variable are valid as a debug print instruction.
+- `mommy~` - Identical to regular stack printing but instead pretty prints the stack, this just means the output string is expanded to span over newlines instead of being a compact single line as with debug printing.
+- `🏳️‍🌈` - Pops the last four bytes on the stack to construct a set of ANSI escape sequences for printing styled text. The role of each byte is as follows:
+  - The first byte is the byte value of the character to print.
+  - The second byte is the ANSI 256 color code to use for the foreground colour.
+  - The third bytes is the ANSI 256 color code to use for the background colour.
+  - The last byte is a set of bitflags corresponding to the following modifiers:
+    - 0 - No Modifiers
+    - 1 - Bold
+    - 2 - Dim
+    - 4 - Italic
+    - 8 - Underlined
+    - 16 - Blink
+    - 32 - Reverse
+    - 64 - Hidden
+    - 128 - Strikethrough
+
+    So, for example, a stack with the values `[38, 3, 1, 13]` would result in the `&` character being printed bold, italic, underlined, and with a yellow foreground colour and a red background colour.
 
 ### Subroutines
 
@@ -35,15 +77,13 @@ Subroutines are a way to reuse code and as we all know, subs love getting used o
 alsdkfkl 🥺
 ```
 
-Subs must of course finish at some point, so to do that simply use `>.<` at the end of the declaration.
+To return from a subroutine, simply use `>.<`. With [conditional evaluation](#conditional-evaluation), it is possible to return early, however all subroutines must still contain a final return because you've always got to make sure your subs finish eventually.
 
 In order to get a subroutine to do anything, you can jump to its instruction block by specifying the identifier of the subroutine you wish to jump to and then `👉👈`, like so:
 
 ```
 alsdkfkl 👉👈
 ```
-
-Something to note is that the `👉👈` instruction will jump to the specified subroutine only if the stack is empty or the top value is a zero byte, otherwise evaluation continues to the next instruction.
 
 ### Comments
 
@@ -76,7 +116,7 @@ Here is a simple "Hello, world!" program with comments tracking the state of the
 
 ```
 🏳️‍⚧️ prints "Hello, world!" to stdout
-hawwo 🥺                                   🏳️‍⚧️ []
+haiii 🥺                                   🏳️‍⚧️ []
   asdelkjla;afsdlkfjaksldkfjd >//////<     🏳️‍⚧️ [8] -> [8, 16] -> [8, 16, 16, 16, 16]
   :3333 >//< mreow                         🏳️‍⚧️ [72] -> [72, 72] -> [72] 'H'
   dksfhapsduiofalsdkfjalsdkasdj :3 >//<    🏳️‍⚧️ [72, 28] -> [100] -> [100, 100]
@@ -84,20 +124,19 @@ hawwo 🥺                                   🏳️‍⚧️ []
   asdfkjhsl :3 >////< meow mrrp            🏳️‍⚧️ [100, 100, 8] -> [100, 108] -> [100, 108, 108, 108] 'l' 'l' -> [100, 108]
   waow :3 yip                              🏳️‍⚧️ [100, 108, 3] -> [100, 111] 'o' -> [100]
   asdkljfhasdklufhasdfasdhjflkjahld >////< 🏳️‍⚧️ [100, 32] -> [100, 32, 32, 32]
-  wlsdkjfhaioua :3 meow mrrp >w< >//<      🏳️‍⚧️ [100, 32, 32, 32, 12] -> [100, 32, 32, 44] -> [100, 32] ',' ' ' -> [32, 100] -> [32, 100, 100]
+  wlsdkjfhaioua :3 meow mrrp @~@ >//<      🏳️‍⚧️ [100, 32, 32, 32, 12] -> [100, 32, 32, 44] -> [100, 32] ',' ' ' -> [32, 100] -> [32, 100, 100]
   fsdklfakl :3 >//<                        🏳️‍⚧️ [32, 100, 100, 8] -> [32, 100, 108] -> [32, 100, 108, 108]
   mkasdpfoasik :3 yip >//<                 🏳️‍⚧️ [32, 100, 108, 108, 11] -> [32, 100, 108, 119] 'W' -> [32, 100, 108] -> [32, 100, 108, 108]
   bleh :3 mreow >//<                       🏳️‍⚧️ [32, 100, 108, 108, 3] -> [32, 100, 108, 111] -> [32, 100, 108] 'o' -> [32, 100, 108, 108]
   asdlkvj :3 meow mrrp mreow               🏳️‍⚧️ [32, 100, 108, 108, 6] -> [32, 100, 108, 114] -> [32] 'r' 'l' 'd'
   um :3 mrrp >.<                           🏳️‍⚧️ [32, 1] -> [33] '!' -> []
 
-hawwo 👉👈
+haiii 👉👈
 ```
 
 As with any language, there is no singular solution to a problem, so your "Hello, world!" could look very different to this one.
 
-You can find the above example within the `examples/` directory and currently it is the only one as the language is still very new and not easy (or maybe impossible) to use for real computation.
-Feel free to submit a pull request with more complex/useful examples!
+You can find the above example within the `examples/` directory which is currently a little barebones. Feel free to submit a pull request with more examples!
 
 ## Customisation
 
