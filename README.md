@@ -1,6 +1,12 @@
 # BottomSpeak
 
-![gender? I hardly know 'er](https://pride-badges.pony.workers.dev/static/v1?label=gender%3F+i+hardly+know+%27er&labelColor=%23555&stripeWidth=8&stripeColors=FCF434%2CFFFFFF%2C9C59D1%2C2C2C2C) ![trans rights :3](https://pride-badges.pony.workers.dev/static/v1?label=trans+rights+%3A3&labelColor=%23555&stripeWidth=8&stripeColors=5BCEFA%2CF5A9B8%2CFFFFFF%2CF5A9B8%2C5BCEFA) ![women and enbies pretty](https://pride-badges.pony.workers.dev/static/v1?label=women+and+enbies+pretty&labelColor=%23555&stripeWidth=8&stripeColors=D52D00%2CEF7627%2CFF9A56%2CFFFFFF%2CD162A4%2CB55690%2CA30262)
+<div align="center">
+
+![gender? I hardly know 'er](https://pride-badges.pony.workers.dev/static/v1?label=gender%3F+i+hardly+know+%27er&labelColor=%23555&stripeWidth=8&stripeColors=FCF434%2CFFFFFF%2C9C59D1%2C2C2C2C)
+![trans rights :3](https://pride-badges.pony.workers.dev/static/v1?label=trans+rights+%3A3&labelColor=%23555&stripeWidth=8&stripeColors=5BCEFA%2CF5A9B8%2CFFFFFF%2CF5A9B8%2C5BCEFA)
+![women and enbies pretty](https://pride-badges.pony.workers.dev/static/v1?label=women+and+enbies+pretty&labelColor=%23555&stripeWidth=8&stripeColors=D52D00%2CEF7627%2CFF9A56%2CFFFFFF%2CD162A4%2CB55690%2CA30262)
+
+</div>
 
 BottomSpeak is the ultimate language for expressing yourself through programming. Expressions? Boring. Types? Who needs 'em? Now you can program with the same kind of basic symbols you'd use when faced with even the slightest amount of dominance!
 
