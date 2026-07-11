@@ -1,4 +1,4 @@
-# BottomSpeak
+<h1 align="center">BottomSpeak</h1>
 
 <div align="center">
 
