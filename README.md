@@ -66,8 +66,8 @@ These instructions look at the top two stack values [`a`, `b`], then check a boo
 - `mommy~` - Identical to regular stack printing but instead pretty prints the stack, this just means the output string is expanded to span over newlines instead of being a compact single line as with debug printing.
 - `🏳️‍🌈` - Pops the last four bytes on the stack to construct a set of ANSI escape sequences for printing styled text. The role of each byte is as follows:
   - The first byte is the byte value of the character to print.
-  - The second byte is the ANSI 256 color code to use for the foreground colour.
-  - The third bytes is the ANSI 256 color code to use for the background colour.
+  - The second byte is the ANSI 256 colour code to use for the foreground colour.
+  - The third byte is the ANSI 256 colour code to use for the background colour.
   - The last byte is a set of bitflags corresponding to the following modifiers:
     - 0 - No Modifiers
     - 1 - Bold
