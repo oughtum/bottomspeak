@@ -48,7 +48,7 @@ macro_rules! cmp_op {
             if !(prev $op current)
                 && let Some(frame) = $self.last_frame_mut()
             {
-                *frame.ins_ptr += 2;
+                *frame.ins_ptr = frame.ins_ptr.saturating_add(1);
             }
         } else {
             $self.ctx.report(diagnostic!(
@@ -89,14 +89,19 @@ pub(crate) enum OpCode {
     GreaterEq,
     LessEq,
     Push(u8),
+    PushScratchPad(u8),
     Pop,
+    PopScratchPad,
     Swap,
+    Rotate,
+    Flip,
     Add,
     Sub,
     Input,
     Print,
     PrintUtf,
     PrintAnsi,
+    PrintLiteral,
     PrintStack(bool),
     Duplicate(bool),
     Jump(String),
@@ -157,6 +162,9 @@ pub(crate) struct Vm<'vm> {
     /// The evaluated values pushed to the user-facing stack.
     stack: Vec<u8>,
 
+    /// A scratchpad for inetermediate storage of a single byte.
+    scratchpad: Option<u8>,
+
     /// A map of strings to the initial registers of subroutine declarations.
     submap: SubroutineMap,
 
@@ -174,6 +182,7 @@ impl<'vm> Vm<'vm> {
         Self {
             ctx,
             stack: Vec::new(),
+            scratchpad: None,
             submap,
             frames: vec![CallFrame::new(INTERNAL_ROOT_SUBROUTINE.to_string())],
             printed_output: String::new(),
@@ -244,8 +253,36 @@ impl<'vm> Vm<'vm> {
                 OpCode::GreaterEq => cmp_op!(self, >=, range),
                 OpCode::LessEq => cmp_op!(self, <=, range),
                 OpCode::Push(val) => self.stack.push(*val),
+                OpCode::PushScratchPad(val) => {
+                    self.scratchpad = Some(*val);
+                }
                 OpCode::Pop => {
+                    if self.stack.is_empty() {
+                        self.ctx.report(diagnostic!(
+                            ErrorKind::InsufficientElements {
+                                op: "pop".to_string(),
+                                petname: self.ctx.rand_petname().into(),
+                                interp_title: self.ctx.rand_interp_title().into()
+                            },
+                            labels = [(range, "")]
+                        ))
+                    }
+
                     self.stack.pop();
+                }
+                OpCode::PopScratchPad => {
+                    if let Some(val) = self.scratchpad {
+                        self.stack.push(val);
+                        self.scratchpad = None;
+                    } else {
+                        self.ctx.report(diagnostic!(
+                            ErrorKind::EmptyScratchPad {
+                                petname: self.ctx.rand_petname().into(),
+                                interp_title: self.ctx.rand_interp_title().into(),
+                            },
+                            labels = [(range, "")]
+                        ));
+                    }
                 }
                 OpCode::Swap => {
                     let current = self.stack.pop();
@@ -267,6 +304,30 @@ impl<'vm> Vm<'vm> {
                         ));
                     }
                 }
+                OpCode::Rotate => {
+                    let val3 = self.stack.pop();
+                    let val2 = self.stack.pop();
+                    let val1 = self.stack.pop();
+
+                    if let Some(val3) = val3
+                        && let Some(val2) = val2
+                        && let Some(val1) = val1
+                    {
+                        self.stack.push(val2);
+                        self.stack.push(val3);
+                        self.stack.push(val1);
+                    } else {
+                        self.ctx.report(diagnostic!(
+                            ErrorKind::InsufficientElements {
+                                op: "rotate".into(),
+                                petname: self.ctx.rand_petname().into(),
+                                interp_title: self.ctx.rand_interp_title().into(),
+                            },
+                            labels = [(range, "")]
+                        ));
+                    }
+                }
+                OpCode::Flip => self.stack.reverse(),
                 OpCode::Add => {
                     let current = self.stack.pop();
                     let prev = self.stack.pop();
@@ -274,7 +335,7 @@ impl<'vm> Vm<'vm> {
                     if let Some(current) = current
                         && let Some(prev) = prev
                     {
-                        self.stack.push(prev + current);
+                        self.stack.push(prev.wrapping_add(current));
                     } else {
                         self.ctx.report(diagnostic!(
                             ErrorKind::InsufficientElements {
@@ -406,11 +467,32 @@ impl<'vm> Vm<'vm> {
                         ));
                     }
                 }
-                OpCode::PrintStack(pretty) => {
-                    if *pretty {
-                        println!("{:#?}", self.stack);
+                OpCode::PrintLiteral => {
+                    let current = self.stack.pop();
+
+                    if let Some(current) = current {
+                        self.printed_output.push_str(&current.to_string());
                     } else {
-                        println!("{:?}", self.stack);
+                        self.ctx.report(diagnostic!(
+                            ErrorKind::InsufficientElements {
+                                op: "print".into(),
+                                petname: self.ctx.rand_petname().into(),
+                                interp_title: self.ctx.rand_interp_title().into(),
+                            },
+                            labels = [(range, "")]
+                        ));
+                    }
+                }
+                OpCode::PrintStack(pretty) => {
+                    let scratchpad = self
+                        .scratchpad
+                        .map(|byte| byte.to_string())
+                        .unwrap_or_default();
+
+                    if *pretty {
+                        println!("[{}]:{:#?}", scratchpad, self.stack);
+                    } else {
+                        println!("[{}]:{:?}", scratchpad, self.stack);
                     }
                 }
                 OpCode::Duplicate(double) => {

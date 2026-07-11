@@ -76,6 +76,12 @@ pub(crate) enum TokenType {
     HeavyFlusteredAt,
     /// '`O~O`'
     HeavyFlusteredO,
+    /// '`0~0`'
+    HeavyFlusteredZero,
+    /// '`uwu`'
+    Uwu,
+    /// '`owo`'
+    Owo,
     /// '`:3`'
     ColonThree {
         add: bool,
@@ -94,20 +100,27 @@ pub(crate) enum TokenType {
     Point,
     /// '`asdlfjhalfadlfkj`'
     Keysmash {
+        tilde: bool,
         lowercase: bool,
         len: u8,
     },
     /// `'meow'`
     Print {
-        utf: bool,
+        kind: PrintKind,
     },
-    /// `'meow~'`
-    PrintAnsi,
     /// '`mommy`'
     InterpTitle {
-        pretty: bool,
+        tilde: bool,
     },
     Error,
     /// '`\0`'
     Eof,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub(crate) enum PrintKind {
+    Normal,
+    Utf,
+    Ansi,
+    Literal,
 }

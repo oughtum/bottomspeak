@@ -24,6 +24,8 @@ For example, `asdfglaskdjh` has a length of 12 characters and thus is encoded as
 
 Ordinarily, keysmashes must be separated by whitespace or a different case, otherwise they get parsed as a single keysmash, but it's also possible to use semicolons (`;`) to delimit them as they are also a common keysmash character e.g. `asdlkj;dfkgjhasdo` is equivalent to `asdlkj dfkgjhasdo`, also `sdlkjBAKLSDJ` and `sdlkj;BAKLSDJ` are equivalent to `sdlkj BAKLSDJ`. In fact, it's possible to use semicolons to delimit any and all instructions as they are just treated the same as whitespace, but their intended use is for keysmashes.
 
+If a keysmash ends with `~`, it instead pushes the byte to the scratchpad, which is a temporary storage buffer that exists outside of the stack and its value can be retrieved and pushed back to the stack at any time. The scratchpad can contain only a single byte and if it already has a value, pushing will overwrite the existing value.
+
 ### Instructions
 
 #### Arithmetic
@@ -48,15 +50,19 @@ These instructions look at the top two stack values [`a`, `b`], then check a boo
 
 - `>//<` - Duplicates the value at the top of the stack. The value can be duplicated multiple times just like with `:3` by repeating the `//` e.g. `>//////<` would duplicate the value three times.
 - `>\\<` - Identical to `>//<` except duplicates the top two stack values i.e. the stack `[1, 2]` would become `[1, 2, 1, 2]`.
-- `O~O` - Pops the top value from the stack and discards it.
 - `@~@` - Swaps the top two stack values.
+- `O~O` - Rotates through the last three stack values i.e. `[1, 2, 3]` would become `[2, 3, 1]` and then `[3, 1, 2]`, before returning to `[1, 2, 3]`.
+- `0~0` - Flips the whole stack i.e. `[1, 2, 3]` would become `[3, 2, 1]`.
+- `UwU` - Pops the top value from the stack and discards it.
+- `OwO` - Pops the value in the scratchpad and pushes it to the stack.
 
 #### I/O
 
 - `>~<` - Takes in a single byte of input from the commandline via the `-i/--input` flag. Multiple byte values can be provided at once but each use of this instruction will only pop the last input value at a time.
 - `meow` - One of several [default keywords](#customisation) used for popping the top stack value and printing it as an ASCII character to stdout. Any keywords defined via the `BOTTOMSPEAK_PRINT_KEYWORDS` environment variable are valid as a print instruction.
-- `meow~` - Similar functionality to regular printing, but instead pops the last three stack values, pads them with an extra zero byte & constructs a unicode codepoint to be printed. For example, a stack with values `[1, 249, 122]` would be `[0x01, 0xf9, 0x7a]` in hexadecimal (or `[0x00, 0x01, 0xf9, 0x7a]` with padding), and thus is converted to the unicode codepoint `u1f97a` (🥺).
-- `mommy` - Another [default keyword](#customisation) normally used internally by the interpreter when reporting errors but also allows users of the language to debug the stack by printing it to stdout. Any keywords defined via the `BOTTOMSPEAK_INTERP_TITLE` environment variable are valid as a debug print instruction.
+- `meow!` - Identical to regular printing except it prints the literal byte value on the stack e.g. `[104]` would print `104` instead of `h` which has the ASCII code 104.
+- `meow~` - Pops the last three stack values, pads them with an extra zero byte & constructs a unicode codepoint to be printed. For example, a stack with values `[1, 249, 122]` would be `[0x01, 0xf9, 0x7a]` in hexadecimal (or `[0x00, 0x01, 0xf9, 0x7a]` with padding), and thus is converted to the unicode codepoint `u1f97a` (🥺).
+- `mommy` - Another [default keyword](#customisation) normally used internally by the interpreter when reporting errors but also allows users of the language to debug the stack by printing it to stdout. Any keywords defined via the `BOTTOMSPEAK_INTERP_TITLE` environment variable are valid as a debug print instruction. This instruction will also print out the scratchpad value e.g. `[0]:[1, 2, 3]`, where `[0]` is the scratchpad and `[1, 2, 3]` is the main stack.
 - `mommy~` - Identical to regular stack printing but instead pretty prints the stack, this just means the output string is expanded to span over newlines instead of being a compact single line as with debug printing.
 - `🏳️‍🌈` - Pops the last four bytes on the stack to construct a set of ANSI escape sequences for printing styled text. The role of each byte is as follows:
   - The first byte is the byte value of the character to print.

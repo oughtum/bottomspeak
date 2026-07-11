@@ -135,10 +135,19 @@ pub(crate) enum ErrorKind {
     },
 
     #[msg(
-        "{interp_title} doesn't quite understand, did you mean to type one of these, {petname}? - `>w<`, `>//<`, `>.<`"
+        "{interp_title} doesn't quite understand, did you mean to type one of these, {petname}? - `>:3`, `>//<`, `>\\\\<`, `>x<`, `>o<`, `>w<`, `>~<`, `>.<`"
     )]
     #[code(0003)]
-    AmbiguousUnfinishedEmoticon {
+    AmbiguousFlusteredEmoticon {
+        interp_title: String,
+        petname: String,
+    },
+
+    #[msg(
+        "{interp_title} doesn't quite understand, did you mean to type one of these, {petname}? - `^x^`, `^o^`, `^w^`"
+    )]
+    #[code(0004)]
+    AmbiguousHappyEmoticon {
         interp_title: String,
         petname: String,
     },
@@ -146,14 +155,14 @@ pub(crate) enum ErrorKind {
     #[msg(
         "{interp_title} thinks your enthusiasm is adorable but keysmashes can't be longer than 127 characters, okay {petname}? mwah~"
     )]
-    #[code(0004)]
+    #[code(0005)]
     OverlongKeysmash {
         interp_title: String,
         petname: String,
     },
 
     #[msg("come on, be a good {praise_term} and use your words for {interp_title}~")]
-    #[code(0005)]
+    #[code(0006)]
     EmptySource {
         praise_term: String,
         interp_title: String,
@@ -162,7 +171,7 @@ pub(crate) enum ErrorKind {
     #[msg(
         "subs need a name for their {interp_title} to call them by and so does this, can you add one for me {petname}?~"
     )]
-    #[code(0006)]
+    #[code(0007)]
     UnnamedSub {
         petname: String,
         interp_title: String,
@@ -171,7 +180,7 @@ pub(crate) enum ErrorKind {
     #[msg(
         "{interp_title} isn't sure where you're trying to jump to, {petname}, could you be a good {praise_term} and add the name of the subroutine you want for me?~"
     )]
-    #[code(0007)]
+    #[code(0008)]
     UnnamedJump {
         interp_title: String,
         petname: String,
@@ -181,19 +190,19 @@ pub(crate) enum ErrorKind {
     #[msg(
         "all good subs need to communicate when they want {interp_title} to stop, so why don't you add a little `>.<` at the end for me~"
     )]
-    #[code(0008)]
+    #[code(0009)]
     SubWithoutReturn { interp_title: String },
 
     #[msg(
         "subroutines aren't allowed to be inside another subroutine, that's {interp_title}'s job~"
     )]
-    #[code(0009)]
+    #[code(0010)]
     NestedSubroutine { interp_title: String },
 
     #[msg(
         "oh you're a very talkative {praise_term} aren't you? unfortunately {interp_title}'s stack isn't infinite, so I think my adorable {praise_term} should shush now~"
     )]
-    #[code(0010)]
+    #[code(0011)]
     ReachedStackLimit {
         praise_term: String,
         interp_title: String,
@@ -202,7 +211,7 @@ pub(crate) enum ErrorKind {
     #[msg(
         "oh {petname}, there aren't enough values on the stack to {op}, could you try again for {interp_title}?~"
     )]
-    #[code(0011)]
+    #[code(0012)]
     InsufficientElements {
         op: String,
         petname: String,
@@ -212,7 +221,7 @@ pub(crate) enum ErrorKind {
     #[msg(
         "sorry {petname}, you're trying to print 0x{codepoint:X} but unicode characters are in the range 0x000000-0x10FFFF, give it another go for {interp_title} okay?~"
     )]
-    #[code(0012)]
+    #[code(0013)]
     InvalidCodepoint {
         codepoint: u32,
         petname: String,
@@ -222,7 +231,7 @@ pub(crate) enum ErrorKind {
     #[msg(
         "{interp_title} couldn't find any subroutine called `{name}`, but I know you can do better for me next time {petname} <3"
     )]
-    #[code(0013)]
+    #[code(0014)]
     UnresolvedSubroutine {
         name: String,
         interp_title: String,
@@ -232,7 +241,7 @@ pub(crate) enum ErrorKind {
     #[msg(
         "{interp_title} needs some help understanding your code, {petname}, so be an obedient {praise_term} and add some comments~"
     )]
-    #[code(0014)]
+    #[code(0015)]
     UncommentedSource {
         interp_title: String,
         petname: String,
@@ -247,5 +256,14 @@ pub(crate) enum ErrorKind {
         interp_title: String,
         petname: String,
         praise_term: String,
+    },
+
+    #[msg(
+        "silly {petname}, there's nothing in the scratchpad, you can do better for {interp_title}~"
+    )]
+    #[code(0017)]
+    EmptyScratchPad {
+        petname: String,
+        interp_title: String,
     },
 }

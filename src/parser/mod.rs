@@ -6,7 +6,7 @@ use crate::{
     lexer::{
         KEYSMASH_MAX_LEN,
         token::{
-            Token, TokenStream,
+            PrintKind, Token, TokenStream,
             TokenType::{self},
         },
     },
@@ -179,9 +179,12 @@ impl<'p> Parser<'p> {
                 }
                 TokenType::FlusteredTilde => self.emit_op(Op::new(OpCode::Input, range)),
                 TokenType::HeavyFlusteredAt => self.emit_op(Op::new(OpCode::Swap, range)),
-                TokenType::HeavyFlusteredO => self.emit_op(Op::new(OpCode::Pop, range)),
-                TokenType::InterpTitle { pretty } => {
-                    self.emit_op(Op::new(OpCode::PrintStack(pretty), range))
+                TokenType::HeavyFlusteredO => self.emit_op(Op::new(OpCode::Rotate, range)),
+                TokenType::HeavyFlusteredZero => self.emit_op(Op::new(OpCode::Flip, range)),
+                TokenType::Uwu => self.emit_op(Op::new(OpCode::Pop, range)),
+                TokenType::Owo => self.emit_op(Op::new(OpCode::PopScratchPad, range)),
+                TokenType::InterpTitle { tilde } => {
+                    self.emit_op(Op::new(OpCode::PrintStack(tilde), range))
                 }
                 TokenType::ColonThree { add, len } => {
                     let range = tok.range();
@@ -222,7 +225,11 @@ impl<'p> Parser<'p> {
                         labels = [(range, "")]
                     ));
                 }
-                TokenType::Keysmash { lowercase, len } => {
+                TokenType::Keysmash {
+                    tilde,
+                    lowercase,
+                    len,
+                } => {
                     let ident = tok.lexeme().to_owned();
                     let range = tok.range();
 
@@ -251,18 +258,24 @@ impl<'p> Parser<'p> {
                         return Some(());
                     }
 
-                    self.emit_op(Op::new(OpCode::Push(val), range))
+                    let code = if tilde {
+                        OpCode::PushScratchPad(val)
+                    } else {
+                        OpCode::Push(val)
+                    };
+
+                    self.emit_op(Op::new(code, range))
                 }
-                TokenType::Print { utf } => {
+                TokenType::Print { kind } => {
                     let range = tok.range();
 
-                    if utf {
-                        self.emit_op(Op::new(OpCode::PrintUtf, range))
-                    } else {
-                        self.emit_op(Op::new(OpCode::Print, range))
+                    match kind {
+                        PrintKind::Normal => self.emit_op(Op::new(OpCode::Print, range)),
+                        PrintKind::Utf => self.emit_op(Op::new(OpCode::PrintUtf, range)),
+                        PrintKind::Ansi => self.emit_op(Op::new(OpCode::PrintAnsi, range)),
+                        PrintKind::Literal => self.emit_op(Op::new(OpCode::PrintLiteral, range)),
                     }
                 }
-                TokenType::PrintAnsi => self.emit_op(Op::new(OpCode::PrintAnsi, range)),
                 TokenType::Error | TokenType::Eof => {
                     self.next();
                     return None;

@@ -3,7 +3,7 @@ use std::range::Range;
 use crate::{
     diagnostic,
     diagnostics::ErrorKind,
-    lexer::token::{Token, TokenStream, TokenType},
+    lexer::token::{PrintKind, Token, TokenStream, TokenType},
     source::SourceContext,
 };
 
@@ -80,12 +80,17 @@ impl<'lx> Lexer<'lx> {
 
     /// Returns whether a character is valid within a keysmash.
     fn is_valid_keysmash_char(&self, c: char) -> bool {
-        c.is_ascii_alphabetic() || (192..=255).contains(&(c as u32))
+        c.is_ascii_alphabetic()
     }
 
     /// Returns a token's lexeme.
     fn lexeme(&self) -> String {
         self.chars[self.range()].iter().collect()
+    }
+
+    /// Returns a token's lexeme with a custom range.
+    fn lexemec(&self, range: impl Into<Range<usize>>) -> String {
+        self.chars[range.into()].iter().collect()
     }
 
     /// Returns the range spanning the characters of the current token's lexeme.
@@ -138,7 +143,8 @@ impl<'lx> Lexer<'lx> {
         while let Some(char) = self.next() {
             let token_type = match char {
                 '>' => self.lex_flustered_emoticon(),
-                '@' | 'O' => self.lex_heavy_flustered_emoticon(char),
+                'U' => self.lex_uwu_owo(TokenType::Uwu, 'U'),
+                '@' | 'O' | '0' => self.lex_heavy_flustered_emoticon(char),
                 '^' => self.lex_happy_emoticon(),
                 ':' => self.lex_colon_three(true),
                 '🥺' => TokenType::Sub,
@@ -204,7 +210,7 @@ impl<'lx> Lexer<'lx> {
             }
             Some(_) | None => {
                 self.ctx.report(diagnostic!(
-                    ErrorKind::AmbiguousUnfinishedEmoticon {
+                    ErrorKind::AmbiguousFlusteredEmoticon {
                         interp_title: self.ctx.rand_interp_title().into(),
                         petname: self.ctx.rand_petname().into(),
                     },
@@ -215,12 +221,42 @@ impl<'lx> Lexer<'lx> {
         }
     }
 
+    /// Lexes `UwU` or `OwO`.
+    fn lex_uwu_owo(&mut self, kind: TokenType, end: char) -> TokenType {
+        let start_range = self.byte_range();
+
+        match self.peek() {
+            Some('w') => {
+                self.next();
+
+                if self.matches(end) {
+                    kind
+                } else {
+                    // treat the previous `U`/`O` and `w` as keysmash parts
+                    // since the next character isn't another `U`/`O`
+                    self.tokenise(
+                        TokenType::Keysmash {
+                            tilde: false,
+                            lowercase: false,
+                            len: 1,
+                        },
+                        self.lexemec(start_range),
+                    );
+
+                    self.lex_keysmash('w')
+                }
+            }
+            // end is the same as the start so we can just use that here
+            Some(_) | None => self.lex_keysmash(end),
+        }
+    }
+
     /// Lexes the final character of a flustered emoticon.
-    fn lex_flustered_end(&mut self, token_type: TokenType, end: char) -> TokenType {
+    fn lex_flustered_end(&mut self, kind: TokenType, end: char) -> TokenType {
         self.next();
 
         if self.matches(end) {
-            token_type
+            kind
         } else {
             self.ctx.report(diagnostic!(
                 ErrorKind::UnfinishedEmoticon {
@@ -321,7 +357,12 @@ impl<'lx> Lexer<'lx> {
 
         // rainbow flag chars (🌈)
         if self.matches('\u{1f308}') {
-            return self.tokenise(TokenType::PrintAnsi, self.lexeme());
+            return self.tokenise(
+                TokenType::Print {
+                    kind: PrintKind::Ansi,
+                },
+                self.lexeme(),
+            );
         }
 
         // trans flag chars (Transgender Symbol + Variation Selector 16)
@@ -339,7 +380,7 @@ impl<'lx> Lexer<'lx> {
         }
     }
 
-    /// Lexes a heavy flustered emoticon i.e. `@~@` or `O~O`
+    /// Lexes a heavy flustered emoticon i.e. `@~@`, `O~O` or `0~0`.
     fn lex_heavy_flustered_emoticon(&mut self, start: char) -> TokenType {
         match start {
             '@' => {
@@ -350,7 +391,7 @@ impl<'lx> Lexer<'lx> {
                         ErrorKind::UnfinishedEmoticon {
                             praise_term: self.ctx.rand_praise_term().into(),
                             petname: self.ctx.rand_petname().into(),
-                            char_to_add: '3'
+                            char_to_add: '@'
                         },
                         labels = [(self.byte_range(), "")]
                     ));
@@ -358,10 +399,27 @@ impl<'lx> Lexer<'lx> {
                 }
             }
             'O' => {
-                if self.check('~') {
+                if self.check('w') {
+                    self.lex_uwu_owo(TokenType::Owo, 'O')
+                } else if self.check('~') {
                     self.lex_flustered_end(TokenType::HeavyFlusteredO, 'O')
                 } else {
                     self.lex_keysmash(start)
+                }
+            }
+            '0' => {
+                if self.check('~') {
+                    self.lex_flustered_end(TokenType::HeavyFlusteredZero, '0')
+                } else {
+                    self.ctx.report(diagnostic!(
+                        ErrorKind::UnfinishedEmoticon {
+                            praise_term: self.ctx.rand_praise_term().into(),
+                            petname: self.ctx.rand_petname().into(),
+                            char_to_add: '0'
+                        },
+                        labels = [(self.byte_range(), "")]
+                    ));
+                    return TokenType::Error;
                 }
             }
             _ => {
@@ -385,7 +443,7 @@ impl<'lx> Lexer<'lx> {
             Some('w') => self.lex_flustered_end(TokenType::HappyW, '^'),
             Some(_) | None => {
                 self.ctx.report(diagnostic!(
-                    ErrorKind::AmbiguousUnfinishedEmoticon {
+                    ErrorKind::AmbiguousHappyEmoticon {
                         interp_title: self.ctx.rand_interp_title().into(),
                         petname: self.ctx.rand_petname().into(),
                     },
@@ -435,6 +493,7 @@ impl<'lx> Lexer<'lx> {
         let lowercase = start.is_lowercase();
 
         if !self.is_valid_keysmash_char(start) {
+            println!("{start}");
             self.ctx.report(diagnostic!(
                 ErrorKind::UnexpectedToken {
                     petname: self.ctx.rand_petname().into(),
@@ -455,7 +514,11 @@ impl<'lx> Lexer<'lx> {
             }
 
             if lowercase != char.is_lowercase() {
-                return TokenType::Keysmash { lowercase, len };
+                return TokenType::Keysmash {
+                    tilde: self.matches('~'),
+                    lowercase,
+                    len,
+                };
             }
 
             if len == KEYSMASH_MAX_LEN {
@@ -477,17 +540,31 @@ impl<'lx> Lexer<'lx> {
         let lexeme = self.lexeme();
 
         if self.ctx.env_vars.print_keywords.contains(&lexeme) {
-            return TokenType::Print {
-                utf: self.matches('~'),
+            let kind = match self.peek() {
+                Some('~') => {
+                    self.next();
+                    PrintKind::Utf
+                }
+                Some('!') => {
+                    self.next();
+                    PrintKind::Literal
+                }
+                Some(_) | None => PrintKind::Normal,
             };
+
+            return TokenType::Print { kind };
         }
 
         if self.ctx.env_vars.interp_titles.contains(&lexeme) {
             TokenType::InterpTitle {
-                pretty: self.matches('~'),
+                tilde: self.matches('~'),
             }
         } else {
-            TokenType::Keysmash { lowercase, len }
+            TokenType::Keysmash {
+                tilde: self.matches('~'),
+                lowercase,
+                len,
+            }
         }
     }
 }

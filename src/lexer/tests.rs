@@ -29,6 +29,7 @@ fn test_lexing() -> crate::Result<()> {
         &vec![
             Token::new(
                 TokenType::Keysmash {
+                    tilde: false,
                     lowercase: true,
                     len: 5
                 },
@@ -38,6 +39,7 @@ fn test_lexing() -> crate::Result<()> {
             Token::new(TokenType::Sub, "🥺", 6..10),
             Token::new(
                 TokenType::Keysmash {
+                    tilde: false,
                     lowercase: true,
                     len: 14
                 },
@@ -46,6 +48,7 @@ fn test_lexing() -> crate::Result<()> {
             ),
             Token::new(
                 TokenType::Keysmash {
+                    tilde: false,
                     lowercase: true,
                     len: 8
                 },
@@ -54,6 +57,7 @@ fn test_lexing() -> crate::Result<()> {
             ),
             Token::new(
                 TokenType::Keysmash {
+                    tilde: false,
                     lowercase: true,
                     len: 4
                 },
@@ -71,9 +75,16 @@ fn test_lexing() -> crate::Result<()> {
             ),
             Token::new(TokenType::FlusteredW, ">w<", 56..59),
             Token::new(TokenType::ColonThree { add: true, len: 3 }, ":333", 94..98),
-            Token::new(TokenType::Print { utf: false }, "mreow", 99..104),
+            Token::new(
+                TokenType::Print {
+                    kind: PrintKind::Normal
+                },
+                "mreow",
+                99..104
+            ),
             Token::new(
                 TokenType::Keysmash {
+                    tilde: false,
                     lowercase: true,
                     len: 11
                 },
@@ -89,7 +100,13 @@ fn test_lexing() -> crate::Result<()> {
                 145..149
             ),
             Token::new(TokenType::ColonThree { add: true, len: 2 }, ":33", 150..153),
-            Token::new(TokenType::Print { utf: false }, "mrrp", 154..158),
+            Token::new(
+                TokenType::Print {
+                    kind: PrintKind::Normal
+                },
+                "mrrp",
+                154..158
+            ),
             Token::new(TokenType::FlusteredDot, ">.<", 188..191),
             Token::new(TokenType::Eof, "\0", 192..192),
         ]
