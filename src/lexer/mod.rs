@@ -143,8 +143,14 @@ impl<'lx> Lexer<'lx> {
         while let Some(char) = self.next() {
             let token_type = match char {
                 '>' => self.lex_flustered_emoticon(),
-                'U' => self.lex_uwu_owo(TokenType::Uwu, 'U'),
-                '@' | 'O' | '0' => self.lex_heavy_flustered_emoticon(char),
+                'U' => {
+                    self.lex_uwu_owo(TokenType::Uwu, 'U');
+                    continue;
+                }
+                '@' | 'O' | '0' => {
+                    self.lex_heavy_flustered_emoticon(char);
+                    continue;
+                }
                 '^' => self.lex_happy_emoticon(),
                 ':' => self.lex_colon_three(true),
                 '🥺' => TokenType::Sub,
@@ -163,7 +169,7 @@ impl<'lx> Lexer<'lx> {
                         TokenType::Error
                     }
                 }
-                '🏳' => {
+                '\u{1f3f3}' => {
                     self.lex_flag_emoji();
                     continue;
                 }
@@ -172,7 +178,10 @@ impl<'lx> Lexer<'lx> {
                     self.start_byte = self.current_byte;
                     continue;
                 }
-                c => self.lex_keysmash(c),
+                c => {
+                    self.lex_keysmash(c);
+                    continue;
+                }
             };
 
             self.tokenise(token_type, self.lexeme());
@@ -222,7 +231,7 @@ impl<'lx> Lexer<'lx> {
     }
 
     /// Lexes `UwU` or `OwO`.
-    fn lex_uwu_owo(&mut self, kind: TokenType, end: char) -> TokenType {
+    fn lex_uwu_owo(&mut self, kind: TokenType, end: char) {
         let start_range = self.byte_range();
 
         match self.peek() {
@@ -230,7 +239,7 @@ impl<'lx> Lexer<'lx> {
                 self.next();
 
                 if self.matches(end) {
-                    kind
+                    self.tokenise(kind, self.lexeme())
                 } else {
                     // treat the previous `U`/`O` and `w` as keysmash parts
                     // since the next character isn't another `U`/`O`
@@ -243,7 +252,7 @@ impl<'lx> Lexer<'lx> {
                         self.lexemec(start_range),
                     );
 
-                    self.lex_keysmash('w')
+                    self.lex_keysmash('w');
                 }
             }
             // end is the same as the start so we can just use that here
@@ -355,7 +364,7 @@ impl<'lx> Lexer<'lx> {
             }
         }
 
-        // rainbow flag chars (🌈)
+        // rainbow flag char (🌈)
         if self.matches('\u{1f308}') {
             return self.tokenise(
                 TokenType::Print {
@@ -365,13 +374,14 @@ impl<'lx> Lexer<'lx> {
             );
         }
 
-        // trans flag chars (Transgender Symbol + Variation Selector 16)
-        for glyph in ['\u{26a7}', '\u{fe0f}'] {
-            if !self.matches(glyph) {
-                self.ctx.report(diag(&self, glyph));
-                return self.tokenise(TokenType::Error, self.lexeme());
-            }
+        // trans flag char (Transgender Symbol)
+        if !self.matches('\u{26a7}') {
+            self.ctx.report(diag(&self, '\u{26a7}'));
+            return self.tokenise(TokenType::Error, self.lexeme());
         }
+
+        // optional Variation Selector 16 for compatibility with differing rendering implementations
+        self.matches('\u{fe0f}');
 
         // token must be a trans flag and so we lex the rest as a comment
         while self.peek().is_some_and(|peek| peek != '\n') {
@@ -381,11 +391,13 @@ impl<'lx> Lexer<'lx> {
     }
 
     /// Lexes a heavy flustered emoticon i.e. `@~@`, `O~O` or `0~0`.
-    fn lex_heavy_flustered_emoticon(&mut self, start: char) -> TokenType {
+    fn lex_heavy_flustered_emoticon(&mut self, start: char) {
         match start {
             '@' => {
                 if self.check('~') {
-                    self.lex_flustered_end(TokenType::HeavyFlusteredAt, '@')
+                    let kind = self.lex_flustered_end(TokenType::HeavyFlusteredAt, '@');
+                    self.tokenise(kind, self.lexeme());
+                    return;
                 } else {
                     self.ctx.report(diagnostic!(
                         ErrorKind::UnfinishedEmoticon {
@@ -395,21 +407,24 @@ impl<'lx> Lexer<'lx> {
                         },
                         labels = [(self.byte_range(), "")]
                     ));
-                    return TokenType::Error;
+                    return self.tokenise(TokenType::Error, self.lexeme());
                 }
             }
             'O' => {
                 if self.check('w') {
-                    self.lex_uwu_owo(TokenType::Owo, 'O')
+                    self.lex_uwu_owo(TokenType::Owo, 'O');
+                    return;
                 } else if self.check('~') {
-                    self.lex_flustered_end(TokenType::HeavyFlusteredO, 'O')
+                    let kind = self.lex_flustered_end(TokenType::HeavyFlusteredO, 'O');
+                    return self.tokenise(kind, self.lexeme());
                 } else {
-                    self.lex_keysmash(start)
+                    return self.lex_keysmash(start);
                 }
             }
             '0' => {
                 if self.check('~') {
-                    self.lex_flustered_end(TokenType::HeavyFlusteredZero, '0')
+                    let kind = self.lex_flustered_end(TokenType::HeavyFlusteredZero, '0');
+                    return self.tokenise(kind, self.lexeme());
                 } else {
                     self.ctx.report(diagnostic!(
                         ErrorKind::UnfinishedEmoticon {
@@ -419,7 +434,7 @@ impl<'lx> Lexer<'lx> {
                         },
                         labels = [(self.byte_range(), "")]
                     ));
-                    return TokenType::Error;
+                    return self.tokenise(TokenType::Error, self.lexeme());
                 }
             }
             _ => {
@@ -430,7 +445,7 @@ impl<'lx> Lexer<'lx> {
                     },
                     labels = [(self.byte_range(), "")]
                 ));
-                TokenType::Error
+                return self.tokenise(TokenType::Error, self.lexeme());
             }
         }
     }
@@ -489,7 +504,7 @@ impl<'lx> Lexer<'lx> {
     }
 
     /// Lexes a keysmash.
-    fn lex_keysmash(&mut self, start: char) -> TokenType {
+    fn lex_keysmash(&mut self, start: char) {
         let lowercase = start.is_lowercase();
 
         if !self.is_valid_keysmash_char(start) {
@@ -503,7 +518,7 @@ impl<'lx> Lexer<'lx> {
                 },
                 labels = [(self.byte_range(), "")]
             ));
-            return TokenType::Error;
+            return self.tokenise(TokenType::Error, self.lexeme());
         }
 
         let mut len = 1;
@@ -514,11 +529,12 @@ impl<'lx> Lexer<'lx> {
             }
 
             if lowercase != char.is_lowercase() {
-                return TokenType::Keysmash {
+                let kind = TokenType::Keysmash {
                     tilde: self.matches('~'),
                     lowercase,
                     len,
                 };
+                return self.tokenise(kind, self.lexeme());
             }
 
             if len == KEYSMASH_MAX_LEN {
@@ -529,7 +545,7 @@ impl<'lx> Lexer<'lx> {
                     },
                     labels = [(self.byte_range(), "")]
                 ));
-                return TokenType::Error;
+                return self.tokenise(TokenType::Error, self.lexeme());
             }
 
             len += 1;
@@ -552,19 +568,41 @@ impl<'lx> Lexer<'lx> {
                 Some(_) | None => PrintKind::Normal,
             };
 
-            return TokenType::Print { kind };
+            return self.tokenise(TokenType::Print { kind }, self.lexeme());
         }
 
         if self.ctx.env_vars.interp_titles.contains(&lexeme) {
-            TokenType::InterpTitle {
+            let kind = TokenType::InterpTitle {
                 tilde: self.matches('~'),
-            }
-        } else {
-            TokenType::Keysmash {
-                tilde: self.matches('~'),
-                lowercase,
-                len,
-            }
+            };
+            return self.tokenise(kind, self.lexeme());
         }
+
+        // ASCII keyword alternative to 🏳️‍🌈 ANSI print token
+        if lexeme == "gay" || lexeme == "GAY" {
+            return self.tokenise(
+                TokenType::Print {
+                    kind: PrintKind::Ansi,
+                },
+                self.lexeme(),
+            );
+        }
+
+        // ASCII keyword alternative to 🏳️‍⚧️ comment token
+        if lexeme == "trans" || lexeme == "TRANS" {
+            while self.peek().is_some_and(|peek| peek != '\n') {
+                self.has_comments = true;
+                self.next();
+            }
+
+            return;
+        }
+
+        let kind = TokenType::Keysmash {
+            tilde: self.matches('~'),
+            lowercase,
+            len,
+        };
+        self.tokenise(kind, self.lexeme())
     }
 }
