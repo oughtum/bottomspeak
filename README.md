@@ -64,7 +64,7 @@ These instructions look at the top two stack values [`a`, `b`], then check a boo
 - `meow~` - Pops the last three stack values, pads them with an extra zero byte & constructs a unicode codepoint to be printed. For example, a stack with values `[1, 249, 122]` would be `[0x01, 0xf9, 0x7a]` in hexadecimal (or `[0x00, 0x01, 0xf9, 0x7a]` with padding), and thus is converted to the unicode codepoint `u1f97a` (🥺).
 - `mommy` - Another [default keyword](#customisation) normally used internally by the interpreter when reporting errors but also allows users of the language to debug the stack by printing it to stdout. Any keywords defined via the `BOTTOMSPEAK_INTERP_TITLE` environment variable are valid as a debug print instruction. This instruction will also print out the scratchpad value e.g. `[0]:[1, 2, 3]`, where `[0]` is the scratchpad and `[1, 2, 3]` is the main stack.
 - `mommy~` - Identical to regular stack printing but instead pretty prints the stack, this just means the output string is expanded to span over newlines instead of being a compact single line as with debug printing.
-- `🏳️‍🌈` - Pops the last four bytes on the stack to construct a set of ANSI escape sequences for printing styled text. The role of each byte is as follows:
+- `🏳️‍🌈` - Pops the last four bytes on the stack to construct a set of ANSI escape sequences for printing styled text. The word `gay` (uppercase or lowercase) is a valid alternative to this instruction for when using emojis is problematic. The role of each byte is as follows:
   - The first byte is the byte value of the character to print.
   - The second byte is the ANSI 256 colour code to use for the foreground colour.
   - The third byte is the ANSI 256 colour code to use for the background colour.
@@ -99,10 +99,12 @@ alsdkfkl 👉👈
 
 ### Comments
 
-Comments are always inline and can be formed using the trans flag emoji '🏳️‍⚧️':
+Comments are always inline and can be formed using the trans flag emoji '🏳️‍⚧️' or the word `trans` (uppercase or lowercase):
 
 ```
 🏳️‍⚧️ Trans rights are human rights :3
+trans Be gay do crime >:3
+TRANS I LOVE WOMEN!!!!!!
 ```
 
 ## Error Reporting
